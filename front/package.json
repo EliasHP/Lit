@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "lit": "^3.2.1",
+    "vite": "^5.4.11"
+  },
+  "name": "lit",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
