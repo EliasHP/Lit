@@ -4,3 +4,8 @@ JAVA backend (spring boot, Maven) and SQL
 Frontend with LIT ( Node.js npm)
 
 with Git and VS code
+
+launch:
+cd back
+mvn clean package
+docker-compose up --build
