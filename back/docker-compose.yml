@@ -20,6 +20,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - ./src/main/audio:/app/audio
     container_name: lit_listener_backend
     depends_on:
       db:
