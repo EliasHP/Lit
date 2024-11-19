@@ -33,4 +33,8 @@ build/
 .vscode/
 
 
-back/src/main/audio/
+# Ignore all files in the audio folder
+back/src/main/audio/*
+
+# But do not ignore the folder itself
+!back/src/main/audio/.gitkeep
