@@ -11,6 +11,14 @@ class AudioFileList extends LitElement {
       padding: 0;
       margin: 0;
     }
+      .audio-list-container {
+      max-height: 80vh; /* Adjust the height relative to the viewport */
+      overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      background-color: #fff;
+    }
     .audio-item {
       display: flex;
       justify-content: space-between;
@@ -57,9 +65,11 @@ class AudioFileList extends LitElement {
 
   render() {
     return html`
+    <div class="audio-list-container">
       <ul class="audio-list">
         ${this.generateFileList()}
       </ul>
+    </div>
     `;
   }
 }
