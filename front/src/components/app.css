@@ -1,46 +1,72 @@
+static styles = css`
 .search-bar-container {
-    margin-bottom: 20px;
-  }
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-  }
-  
-  #app-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-  
-  #header {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  #folder {
-    width: 80%;
-    max-width: 800px;
-    background: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  #folder-title {
-    font-size: 20px;
-    margin-bottom: 10px;
-    font-weight: bold;
-    color: #555;
-  }
-  
+  margin-bottom: 20px;
+  display: flex;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+}
+
+.main-content {
+  display:flex;
+}
+
+#app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.file-list-container {
+  display: flex; 
+  max-width: 40%; 
+}
+
+.audio-player-container {
+  display: flex;
+  max-width: 60%;
+  min-width: 60%;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.audio-player-container unified-audio-player {
+  width: 100%;
+}
+
+#header {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+#folder {
+  width: 80%;
+  max-width: 1200px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#folder-title {
+  font-size: 20px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #555;
+}
+
+`;

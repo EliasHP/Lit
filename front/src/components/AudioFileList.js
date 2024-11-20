@@ -34,7 +34,12 @@ class AudioFileList extends LitElement {
       console.log('Audio files updated:', this.audioFiles);
     }
   }
-
+  handleFileClick(file) {
+    console.log('File clicked:', file); // Debug log
+    this.dispatchEvent(new CustomEvent('file-selected', { detail: file }));
+  }
+  
+  
   generateFileList() {
     if (!this.audioFiles || this.audioFiles.length === 0) {
       return html`<li>No audio files found.</li>`;
@@ -42,7 +47,7 @@ class AudioFileList extends LitElement {
 
     return this.audioFiles.map(
       (file) => html`
-        <li class="audio-item">
+        <li class="audio-item" @click="${() => this.handleFileClick(file)}">
           <span>${file.name}</span>
           <span>${file.path}</span>
         </li>
