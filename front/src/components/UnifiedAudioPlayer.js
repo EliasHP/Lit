@@ -1,4 +1,5 @@
 import WaveSurfer from 'wavesurfer.js';
+import './AudioTuner.js';
 import { LitElement, html, css } from 'lit';
 
 class UnifiedAudioPlayer extends LitElement {
@@ -305,9 +306,14 @@ class UnifiedAudioPlayer extends LitElement {
               .value="${this.endPoint || this.waveSurfer?.getDuration()}"
               @input="${this.setEndPoint}"
             />
+            
           </div>
+
         </div>
-      </div>
+        <audio-tuner
+          .audioContext="${this.audioContext}"
+          .sourceNode="${this.sourceNode}"
+        ></audio-tuner>
     `;
   }
 }
