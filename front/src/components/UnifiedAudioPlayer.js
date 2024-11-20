@@ -3,12 +3,12 @@ import { LitElement, html, css } from 'lit';
 
 class UnifiedAudioPlayer extends LitElement {
   static properties = {
-    src: { type: String }, // Audio file path
+    src: { type: String },
     isLooping: { type: Boolean },
-    playbackRate: { type: Number }, // Speed control
-    volume: { type: Number }, // Volume control
-    startPoint: { type: Number }, // Start point for playback
-    endPoint: { type: Number }, // End point for playback
+    playbackRate: { type: Number },
+    volume: { type: Number },
+    startPoint: { type: Number },
+    endPoint: { type: Number },
   };
 
   static styles = css`
@@ -26,6 +26,13 @@ class UnifiedAudioPlayer extends LitElement {
       height: 100px;
       margin-bottom: 10px;
       position: relative;
+    }
+    .waveform-overlay {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background-color: rgba(0, 123, 255, 0.2);
+      pointer-events: none;
     }
     .controls {
       margin-top: 10px;
@@ -85,7 +92,6 @@ class UnifiedAudioPlayer extends LitElement {
     this.endPoint = null;
     this.waveSurfer = null;
 
-    // Bind key events for spacebar
     this.handleKeyPress = this.handleKeyPress.bind(this);
   }
 
@@ -100,21 +106,23 @@ class UnifiedAudioPlayer extends LitElement {
   }
 
   firstUpdated() {
-    // Initialize WaveSurfer
     this.waveSurfer = WaveSurfer.create({
       container: this.shadowRoot.querySelector('.waveform-container'),
       waveColor: '#ddd',
       progressColor: '#007bff',
-      backend: 'WebAudio', // WebAudio backend is required for setCurrentTime
+      backend: 'WebAudio',
     });
 
     if (this.src) {
       this.loadAudio();
     }
 
-    // Listen to playback progress to handle looping
     this.waveSurfer.on('audioprocess', () => {
-      if (this.isLooping && this.endPoint !== null && this.waveSurfer.getCurrentTime() > this.endPoint) {
+      if (
+        this.isLooping &&
+        this.endPoint !== null &&
+        this.waveSurfer.getCurrentTime() > this.endPoint
+      ) {
         this.waveSurfer.seekTo(this.startPoint / this.waveSurfer.getDuration());
         this.waveSurfer.play();
       }
@@ -124,26 +132,23 @@ class UnifiedAudioPlayer extends LitElement {
   updated(changedProperties) {
     if (changedProperties.has('src')) {
       if (this.src) {
-        console.log('Audio source updated:', this.src);
         this.loadAudio();
       } else if (this.waveSurfer) {
-        console.log('Clearing waveform, no audio source provided');
-        this.waveSurfer.empty(); // Clear waveform when no audio source
+        this.waveSurfer.empty();
       }
     }
   }
 
   loadAudio() {
-    if (this.waveSurfer) {
-      this.waveSurfer.load(this.src);
-      this.waveSurfer.on('ready', () => {
-        this.endPoint = this.waveSurfer.getDuration(); // Set endPoint to full duration
-      });
-    }
+    this.waveSurfer.load(this.src);
+    this.waveSurfer.on('ready', () => {
+      this.endPoint = this.waveSurfer.getDuration();
+      this.requestUpdate();
+    });
   }
 
   playAudio() {
-    this.waveSurfer.play();
+    this.waveSurfer.play(this.startPoint, this.endPoint);
   }
 
   pauseAudio() {
@@ -174,11 +179,17 @@ class UnifiedAudioPlayer extends LitElement {
   }
 
   setStartPoint(event) {
-    this.startPoint = parseFloat(event.target.value);
+    this.startPoint = Math.min(
+      parseFloat(event.target.value),
+      this.endPoint || this.waveSurfer.getDuration()
+    );
   }
 
   setEndPoint(event) {
-    this.endPoint = parseFloat(event.target.value);
+    this.endPoint = Math.max(
+      parseFloat(event.target.value),
+      this.startPoint
+    );
   }
 
   handleKeyPress(event) {
@@ -193,12 +204,28 @@ class UnifiedAudioPlayer extends LitElement {
   }
 
   render() {
+    const waveformWidth = this.waveSurfer?.getDuration()
+      ? (this.startPoint / this.waveSurfer.getDuration()) * 100
+      : 0;
+
+    const endWidth = this.waveSurfer?.getDuration()
+      ? ((this.endPoint || this.waveSurfer.getDuration()) /
+          this.waveSurfer.getDuration()) *
+        100
+      : 100;
+
     return html`
       <div class="player-container">
         <div class="waveform-container">
+          <div
+            class="waveform-overlay"
+            style="left: ${waveformWidth}%; right: ${100 - endWidth}%;"
+          ></div>
           <div class="start-end-labels">
             <span>Start: ${this.startPoint.toFixed(2)}s</span>
-            <span>End: ${this.endPoint ? this.endPoint.toFixed(2) + 's' : 'Full Length'}</span>
+            <span>End: ${this.endPoint
+              ? this.endPoint.toFixed(2) + 's'
+              : 'Full Length'}</span>
           </div>
         </div>
         <div class="controls">
@@ -206,28 +233,78 @@ class UnifiedAudioPlayer extends LitElement {
           <button @click="${this.pauseAudio}">Pause</button>
           <button @click="${this.stopAudio}">Stop</button>
           <button @click="${this.rewindAudio}">Rewind 5s</button>
-          <button @click="${this.toggleLoop}" style="background-color: ${this.isLooping ? '#28a745' : '#007bff'}">
+          <button
+            @click="${this.toggleLoop}"
+            style="background-color: ${this.isLooping ? '#28a745' : '#007bff'}"
+          >
             Loop: ${this.isLooping ? 'On' : 'Off'}
           </button>
         </div>
         <div class="sliders">
           <div class="slider-container">
             <label>Volume</label>
-            <input type="range" min="0" max="1" step="0.01" .value="${this.volume}" @input="${this.setVolume}" />
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              .value="${this.volume}"
+              @input="${this.setVolume}"
+            />
           </div>
           <div class="slider-container">
             <label>Speed</label>
-            <input class="numeric-input" type="number" min="0.5" max="2" step="0.1" .value="${this.playbackRate}" @input="${this.setPlaybackRate}" />
+            <input
+              class="numeric-input"
+              type="number"
+              min="0.5"
+              max="2"
+              step="0.1"
+              .value="${this.playbackRate}"
+              @input="${this.setPlaybackRate}"
+            />
           </div>
         </div>
         <div class="sliders">
           <div class="slider-container">
             <label>Start</label>
-            <input type="range" min="0" max="${this.waveSurfer?.getDuration() || 0}" step="0.1" .value="${this.startPoint}" @input="${this.setStartPoint}" />
+            <input
+              type="range"
+              min="0"
+              max="${this.waveSurfer?.getDuration() || 0}"
+              step="0.1"
+              .value="${this.startPoint}"
+              @input="${this.setStartPoint}"
+            />
+            <input
+              class="numeric-input"
+              type="number"
+              min="0"
+              max="${this.waveSurfer?.getDuration() || 0}"
+              step="0.1"
+              .value="${this.startPoint}"
+              @input="${this.setStartPoint}"
+            />
           </div>
           <div class="slider-container">
             <label>End</label>
-            <input type="range" min="0" max="${this.waveSurfer?.getDuration() || 0}" step="0.1" .value="${this.endPoint || this.waveSurfer?.getDuration()}" @input="${this.setEndPoint}" />
+            <input
+              type="range"
+              min="0"
+              max="${this.waveSurfer?.getDuration() || 0}"
+              step="0.1"
+              .value="${this.endPoint || this.waveSurfer?.getDuration()}"
+              @input="${this.setEndPoint}"
+            />
+            <input
+              class="numeric-input"
+              type="number"
+              min="0"
+              max="${this.waveSurfer?.getDuration() || 0}"
+              step="0.1"
+              .value="${this.endPoint || this.waveSurfer?.getDuration()}"
+              @input="${this.setEndPoint}"
+            />
           </div>
         </div>
       </div>
