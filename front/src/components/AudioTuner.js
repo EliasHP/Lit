@@ -87,6 +87,12 @@ class AudioTuner extends LitElement {
         filterFrequency: this.filterFrequency,
         filterBandwidth: this.filterBandwidth,
       };
+      // Stop playback if in progress
+      const audioPlayer = document.querySelector('unified-audio-player');
+      if (audioPlayer) {
+          audioPlayer.pauseAudio(); // Assuming pauseAudio() exists
+      }
+
       const response = await processAudio(params);
       const newFilePath = await response;
   
