@@ -1,11 +1,16 @@
 import { LitElement, html, css } from 'lit';
+import { processAudio } from './../api';
 
 class AudioTuner extends LitElement {
   static properties = {
-    audioContext: { type: Object },
-    sourceNode: { type: Object },
-    gainValue: { type: Number }, // For volume
-    compressionActive: { type: Boolean }, // Toggle for compression
+    pitchFactor: { type: Number },
+    amplificationFactor: { type: Number },
+    compressionThreshold: { type: Number },
+    compressionRatio: { type: Number },
+    filterFrequency: { type: Number },
+    filterBandwidth: { type: Number },
+    processingType: { type: String },
+    filePath: { type: String },
   };
 
   static styles = css`
@@ -30,7 +35,7 @@ class AudioTuner extends LitElement {
       color: #333;
     }
 
-    input[type='range'] {
+    input[type='range'], input[type='number'] {
       width: 100%;
     }
 
@@ -50,72 +55,138 @@ class AudioTuner extends LitElement {
 
   constructor() {
     super();
-    this.audioContext = null;
-    this.sourceNode = null;
-    this.gainValue = 1.0;
-    this.compressionActive = false;
-    this.gainNode = null;
-    this.compressorNode = null;
+    this.pitchFactor = 1.0;
+    this.amplificationFactor = 1.0;
+    this.compressionThreshold = -20;
+    this.compressionRatio = 2.0;
+    this.filterFrequency = 1000;
+    this.filterBandwidth = 200;
+    this.processingType = 'pitch';
   }
 
-  firstUpdated() {
-    // Initialize audio nodes
-    if (this.audioContext && this.sourceNode) {
-      this.setupAudioChain();
+  async processAudioFile() {
+    try {
+      console.log('Processing audio with params:', {
+        type: this.processingType,
+        filePath: this.filePath,
+        pitchFactor: this.pitchFactor,
+        amplificationFactor: this.amplificationFactor,
+        compressionThreshold: this.compressionThreshold,
+        compressionRatio: this.compressionRatio,
+        filterFrequency: this.filterFrequency,
+        filterBandwidth: this.filterBandwidth,
+      });
+  
+      const params = {
+        type: this.processingType,
+        filePath: this.filePath, 
+        pitchFactor: this.pitchFactor,
+        amplificationFactor: this.amplificationFactor,
+        compressionThreshold: this.compressionThreshold,
+        compressionRatio: this.compressionRatio,
+        filterFrequency: this.filterFrequency,
+        filterBandwidth: this.filterBandwidth,
+      };
+      const response = await processAudio(params);
+      const newFilePath = await response;
+  
+      this.dispatchEvent(new CustomEvent('file-processed', {
+        detail: { newFilePath },
+        bubbles: true,
+        composed: true,
+      }));
+  
+      console.log('Audio processed successfully:', newFilePath);
+      alert('Audio processed successfully!');
+    } catch (error) {
+      console.error('Error processing audio:', error);
+      alert('Error processing audio. Please check the logs.');
     }
   }
+  
 
-  setupAudioChain() {
-    // Create GainNode for volume adjustment
-    this.gainNode = this.audioContext.createGain();
-    this.gainNode.gain.value = this.gainValue;
-
-    // Create DynamicsCompressorNode for noise capping
-    this.compressorNode = this.audioContext.createDynamicsCompressor();
-    this.compressorNode.threshold.value = -30; // Adjust based on requirements
-    this.compressorNode.knee.value = 40;
-    this.compressorNode.ratio.value = 12;
-    this.compressorNode.attack.value = 0.003;
-    this.compressorNode.release.value = 0.25;
-
-    // Connect nodes in the audio chain
-    this.sourceNode.connect(this.gainNode);
-    this.gainNode.connect(this.compressorNode);
-    this.compressorNode.connect(this.audioContext.destination);
-  }
-
-  handleVolumeChange(event) {
-    const newValue = parseFloat(event.target.value);
-    this.gainValue = newValue;
-    if (this.gainNode) {
-      this.gainNode.gain.value = newValue;
-    }
-  }
-
-  toggleCompression() {
-    this.compressionActive = !this.compressionActive;
-    if (this.compressorNode) {
-      this.compressorNode.threshold.value = this.compressionActive ? -30 : 0; // Adjust threshold
-    }
-  }
 
   render() {
     return html`
       <div class="tuner-container">
         <div class="slider-container">
-          <label for="volume">Volume</label>
+          <label>Pitch Adjustment</label>
           <input
-            id="volume"
             type="range"
-            min="0"
+            min="0.5"
             max="2"
             step="0.1"
-            value="${this.gainValue}"
-            @input="${this.handleVolumeChange}"
+            .value="${this.pitchFactor}"
+            @input="${(e) => (this.pitchFactor = parseFloat(e.target.value))}"
           />
         </div>
-        <button @click="${this.toggleCompression}">
-          ${this.compressionActive ? 'Disable' : 'Enable'} Compression
+
+        <div class="slider-container">
+          <label>Amplification</label>
+          <input
+            type="range"
+            min="0.1"
+            max="3"
+            step="0.1"
+            .value="${this.amplificationFactor}"
+            @input="${(e) =>
+              (this.amplificationFactor = parseFloat(e.target.value))}"
+          />
+        </div>
+
+        <div class="slider-container">
+          <label>Compression Threshold (dB)</label>
+          <input
+            type="number"
+            min="-50"
+            max="0"
+            .value="${this.compressionThreshold}"
+            @input="${(e) =>
+              (this.compressionThreshold = parseFloat(e.target.value))}"
+          />
+        </div>
+
+        <div class="slider-container">
+          <label>Compression Ratio</label>
+          <input
+            type="range"
+            min="1"
+            max="10"
+            step="0.1"
+            .value="${this.compressionRatio}"
+            @input="${(e) =>
+              (this.compressionRatio = parseFloat(e.target.value))}"
+          />
+        </div>
+
+        <div class="slider-container">
+          <label>Filter Frequency (Hz)</label>
+          <input
+            type="number"
+            min="20"
+            max="20000"
+            step="100"
+            .value="${this.filterFrequency}"
+            @input="${(e) =>
+              (this.filterFrequency = parseFloat(e.target.value))}"
+          />
+        </div>
+
+        <div class="slider-container">
+          <label>Filter Bandwidth</label>
+          <input
+            type="number"
+            min="10"
+            max="5000"
+            step="10"
+            .value="${this.filterBandwidth}"
+            @input="${(e) =>
+              (this.filterBandwidth = parseFloat(e.target.value))}"
+          />
+        </div>
+
+        <button @click="${this.processAudioFile}">
+          Process Audio
         </button>
       </div>
     `;

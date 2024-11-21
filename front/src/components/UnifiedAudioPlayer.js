@@ -92,7 +92,6 @@ class UnifiedAudioPlayer extends LitElement {
     this.startPoint = 0;
     this.endPoint = null;
     this.waveSurfer = null;
-
     this.handleKeyPress = this.handleKeyPress.bind(this);
   }
 
@@ -109,7 +108,7 @@ class UnifiedAudioPlayer extends LitElement {
   firstUpdated() {
     this.waveSurfer = WaveSurfer.create({
       container: this.shadowRoot.querySelector('.waveform-container'),
-      waveColor: '#ddd',
+      waveColor: '#757575',
       progressColor: '#007bff',
       backend: 'WebAudio',
     });
@@ -128,7 +127,26 @@ class UnifiedAudioPlayer extends LitElement {
         this.waveSurfer.play();
       }
     });
+
+    this.waveSurfer.on('ready', () => {
+      this.endPoint = this.waveSurfer.getDuration();
+      this.requestUpdate();
+    });
   }
+  connectedCallback() {
+    super.connectedCallback();
+    document.addEventListener('file-processed', this.handleFileProcessed.bind(this));
+}
+
+disconnectedCallback() {
+    document.removeEventListener('file-processed', this.handleFileProcessed.bind(this));
+    super.disconnectedCallback();
+}
+
+handleFileProcessed(event) {
+    const newFilePath = event.detail.newFilePath;
+    this.updateFileSource(newFilePath); // Update the audio player with the new file path
+}
 
   updated(changedProperties) {
     if (changedProperties.has('src')) {
@@ -147,7 +165,17 @@ class UnifiedAudioPlayer extends LitElement {
       this.requestUpdate();
     });
   }
-
+  // Swap the file dynamically after processing
+  updateFileSource(newSrc) {
+    this.src = newSrc;
+    this.loadAudio(newSrc); // Reload the audio file with the updated source
+    // Keep sliders and controls intact
+  }
+  handleFileProcessed(event) {
+    const newFileUrl = event.detail.newFileUrl;
+    this.updateFileSource(newFileUrl); // Use the new URL as the source
+  }
+  
   playAudio() {
     this.waveSurfer.play(this.startPoint, this.endPoint);
   }
@@ -311,6 +339,7 @@ class UnifiedAudioPlayer extends LitElement {
 
         </div>
         <audio-tuner
+          .filePath="${this.src}"
           .audioContext="${this.audioContext}"
           .sourceNode="${this.sourceNode}"
         ></audio-tuner>
