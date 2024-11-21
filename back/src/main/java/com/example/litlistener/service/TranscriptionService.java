@@ -1,15 +1,14 @@
 package com.example.litlistener.service;
 
 import com.example.litlistener.entity.AudioFile;
-import com.example.litlistener.AudioFileRepository;
 import com.example.litlistener.request.TranscriptionRequest;
 import com.example.litlistener.response.TranscriptionResponse;
+import com.example.litlistener.repository.AudioFileRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.stereotype.Repository;
-import com.example.litlistener.entity.AudioFile;
 
 @Service
 public class TranscriptionService {
