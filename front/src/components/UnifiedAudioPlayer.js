@@ -95,15 +95,37 @@ class UnifiedAudioPlayer extends LitElement {
     this.handleKeyPress = this.handleKeyPress.bind(this);
   }
 
-  connectedCallback() {
+connectedCallback() {
     super.connectedCallback();
-    document.addEventListener('keydown', this.handleKeyPress);
-  }
 
-  disconnectedCallback() {
-    document.removeEventListener('keydown', this.handleKeyPress);
+    // Add keydown listener
+    if (!this.boundHandleKeyPress) {
+        this.boundHandleKeyPress = this.handleKeyPress.bind(this);
+        document.addEventListener('keydown', this.boundHandleKeyPress);
+    }
+
+    // Add file-processed listener
+    if (!this.boundHandleFileProcessed) {
+        this.boundHandleFileProcessed = this.handleFileProcessed.bind(this);
+        document.addEventListener('file-processed', this.boundHandleFileProcessed);
+    }
+}
+
+disconnectedCallback() {
+    // Remove keydown listener
+    if (this.boundHandleKeyPress) {
+        document.removeEventListener('keydown', this.boundHandleKeyPress);
+        this.boundHandleKeyPress = null;
+    }
+
+    // Remove file-processed listener
+    if (this.boundHandleFileProcessed) {
+        document.removeEventListener('file-processed', this.boundHandleFileProcessed);
+        this.boundHandleFileProcessed = null;
+    }
+
     super.disconnectedCallback();
-  }
+}
 
   firstUpdated() {
     this.waveSurfer = WaveSurfer.create({
@@ -133,20 +155,22 @@ class UnifiedAudioPlayer extends LitElement {
       this.requestUpdate();
     });
   }
-  connectedCallback() {
-    super.connectedCallback();
-    document.addEventListener('file-processed', this.handleFileProcessed.bind(this));
+
+
+  handleFileProcessed(event) {
+    console.log('File-processed event received:', event);
+    const newFilePath = event.detail?.newFilePath;
+
+    if (!newFilePath) {
+        console.error('No new file path provided in file-processed event');
+        return;
+    }
+
+    console.log(`Processed file path received: ${newFilePath}`);
+    this.updateFileSource(newFilePath);
 }
 
-disconnectedCallback() {
-    document.removeEventListener('file-processed', this.handleFileProcessed.bind(this));
-    super.disconnectedCallback();
-}
 
-handleFileProcessed(event) {
-    const newFilePath = event.detail.newFilePath;
-    this.updateFileSource(newFilePath); // Update the audio player with the new file path
-}
 
   updated(changedProperties) {
     if (changedProperties.has('src')) {
@@ -167,14 +191,16 @@ handleFileProcessed(event) {
   }
   // Swap the file dynamically after processing
   updateFileSource(newSrc) {
+    if (!newSrc) {
+        console.error('No source provided to updateFileSource!');
+        return;
+    }
+
+    console.log(`Updating file source to: ${newSrc}`);
     this.src = newSrc;
-    this.loadAudio(newSrc); // Reload the audio file with the updated source
-    // Keep sliders and controls intact
-  }
-  handleFileProcessed(event) {
-    const newFileUrl = event.detail.newFileUrl;
-    this.updateFileSource(newFileUrl); // Use the new URL as the source
-  }
+    this.waveSurfer.empty(); 
+    this.waveSurfer.load(this.src); 
+}
   
   playAudio() {
     this.waveSurfer.play(this.startPoint, this.endPoint);
@@ -339,9 +365,7 @@ handleFileProcessed(event) {
 
         </div>
         <audio-tuner
-          .filePath="${this.src}"
-          .audioContext="${this.audioContext}"
-          .sourceNode="${this.sourceNode}"
+          .filePath="${this.src}" 
         ></audio-tuner>
     `;
   }

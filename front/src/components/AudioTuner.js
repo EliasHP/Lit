@@ -90,14 +90,14 @@ class AudioTuner extends LitElement {
       const response = await processAudio(params);
       const newFilePath = await response;
   
+      console.log('Dispatching file-processed event with:', { newFilePath });
       this.dispatchEvent(new CustomEvent('file-processed', {
-        detail: { newFilePath },
-        bubbles: true,
-        composed: true,
+          detail: { newFilePath },
+          bubbles: true,
+          composed: true,
       }));
-  
-      console.log('Audio processed successfully:', newFilePath);
-      alert('Audio processed successfully!');
+      
+      
     } catch (error) {
       console.error('Error processing audio:', error);
       alert('Error processing audio. Please check the logs.');

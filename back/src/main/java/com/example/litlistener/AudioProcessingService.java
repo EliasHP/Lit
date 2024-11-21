@@ -4,16 +4,20 @@ import com.example.litlistener.AudioProcessingRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @Service
 public class AudioProcessingService {
 
     public String processAudio(AudioProcessingRequest request) throws Exception {
-        if (request.getFilePath() == null || request.getFilePath().isEmpty()) {
-            throw new IllegalArgumentException("File path cannot be null or empty.");
+        System.out.println("Processing audio: " + request.getFilePath());
+        File file = new File(request.getFilePath());
+        if (!file.exists()) {
+            throw new FileNotFoundException("File not found at path: " + request.getFilePath());
         }
-        if (!isValidFile(request.getFilePath())) {
-            throw new IllegalArgumentException("Invalid file: " + request.getFilePath());
+        if (!file.canRead()) {
+            throw new IOException("Cannot read file at path: " + request.getFilePath());
         }
 
         switch (request.getType()) {
@@ -33,17 +37,28 @@ public class AudioProcessingService {
         }
     }
 
-    private boolean isValidFile(String filePath) {
-        File file = new File(filePath);
-        return file.exists() && file.isFile();
-    }
-
     private String adjustPitch(String filePath, double pitchFactor) {
+        System.out.println("Adjusting pitch for: " + filePath + " with factor: " + pitchFactor);
         try {
-            String outputFilePath = filePath.replace(".mp3", "_pitch.mp3");
+            // Generate the output file path for the "_pitch" file
+            String outputFilePath;
+            if (filePath.endsWith("_pitch.mp3")) {
+                outputFilePath = filePath; // Use the same file if it already has _pitch
+            } else {
+                outputFilePath = filePath.replace(".mp3", "_pitch.mp3");
+            }
+
+            File outputFile = new File(outputFilePath);
+
+            if (outputFile.exists()) {
+                System.out.println("Overwriting existing file: " + outputFilePath);
+            }
+            // Use FFmpeg to process the file
             ProcessBuilder pb = new ProcessBuilder(
-                    "ffmpeg", "-i", filePath, "-filter:a", "asetrate=" + (44100 * pitchFactor), outputFilePath);
+                    "ffmpeg", "-y", "-i", filePath, "-filter:a", "asetrate=" + (44100 * pitchFactor), outputFilePath);
             runProcess(pb);
+
+            System.out.println("Processed file path: " + outputFilePath);
             return outputFilePath;
         } catch (Exception e) {
             throw new RuntimeException("Error adjusting pitch: " + e.getMessage());
@@ -51,10 +66,22 @@ public class AudioProcessingService {
     }
 
     private String amplifyAudio(String filePath, double amplificationFactor) {
+        System.out.println("Adjusting amplificationFactor for: " + filePath + " with factor: " + amplificationFactor);
         try {
-            String outputFilePath = filePath.replace(".mp3", "_amplified.mp3");
+            String outputFilePath;
+            if (filePath.endsWith("_pitch.mp3")) {
+                outputFilePath = filePath; // Use the same file if it already has _pitch
+            } else {
+                outputFilePath = filePath.replace(".mp3", "_pitch.mp3");
+            }
+
+            File outputFile = new File(outputFilePath);
+
+            if (outputFile.exists()) {
+                System.out.println("Overwriting existing file: " + outputFilePath);
+            }
             ProcessBuilder pb = new ProcessBuilder(
-                    "ffmpeg", "-i", filePath, "-filter:a", "volume=" + amplificationFactor, outputFilePath);
+                    "ffmpeg", "-y", "-i", filePath, "-filter:a", "volume=" + amplificationFactor, outputFilePath);
             runProcess(pb);
             return outputFilePath;
         } catch (Exception e) {
@@ -63,10 +90,23 @@ public class AudioProcessingService {
     }
 
     private String compressAudio(String filePath, double threshold, double ratio) {
+        System.out.println("Adjusting Compress audio for: " + filePath + " with factor: " + threshold + " & " + ratio);
         try {
-            String outputFilePath = filePath.replace(".mp3", "_compressed.mp3");
+            String outputFilePath;
+            if (filePath.endsWith("_pitch.mp3")) {
+                outputFilePath = filePath; // Use the same file if it already has _pitch
+            } else {
+                outputFilePath = filePath.replace(".mp3", "_pitch.mp3");
+            }
+
+            File outputFile = new File(outputFilePath);
+
+            if (outputFile.exists()) {
+                System.out.println("Overwriting existing file: " + outputFilePath);
+            }
             ProcessBuilder pb = new ProcessBuilder(
-                    "ffmpeg", "-i", filePath, "-filter:a", "acompressor=threshold=" + threshold + ":ratio=" + ratio,
+                    "ffmpeg", "-y", "-i", filePath, "-filter:a",
+                    "acompressor=threshold=" + threshold + ":ratio=" + ratio,
                     outputFilePath);
             runProcess(pb);
             return outputFilePath;
@@ -76,10 +116,24 @@ public class AudioProcessingService {
     }
 
     private String filterAudio(String filePath, double frequency, double bandwidth) {
+        System.out.println(
+                "Adjusting frequency filter for: " + filePath + " with factor: " + frequency + " & " + bandwidth);
         try {
-            String outputFilePath = filePath.replace(".mp3", "_filtered.mp3");
+            String outputFilePath;
+            if (filePath.endsWith("_pitch.mp3")) {
+                outputFilePath = filePath; // Use the same file if it already has _pitch
+            } else {
+                outputFilePath = filePath.replace(".mp3", "_pitch.mp3");
+            }
+
+            File outputFile = new File(outputFilePath);
+
+            if (outputFile.exists()) {
+                System.out.println("Overwriting existing file: " + outputFilePath);
+            }
             ProcessBuilder pb = new ProcessBuilder(
-                    "ffmpeg", "-i", filePath, "-filter:a", "bandpass=f=" + frequency + ":width_type=h:w=" + bandwidth,
+                    "ffmpeg", "-y", "-i", filePath, "-filter:a",
+                    "bandpass=f=" + frequency + ":width_type=h:w=" + bandwidth,
                     outputFilePath);
             runProcess(pb);
             return outputFilePath;
@@ -89,10 +143,22 @@ public class AudioProcessingService {
     }
 
     private String denoiseAudio(String filePath) {
+        System.out.println("Adjusting Denoisingr for: " + filePath + " with factor Denoising");
         try {
-            String outputFilePath = filePath.replace(".mp3", "_denoised.mp3");
+            String outputFilePath;
+            if (filePath.endsWith("_pitch.mp3")) {
+                outputFilePath = filePath; // Use the same file if it already has _pitch
+            } else {
+                outputFilePath = filePath.replace(".mp3", "_pitch.mp3");
+            }
+
+            File outputFile = new File(outputFilePath);
+
+            if (outputFile.exists()) {
+                System.out.println("Overwriting existing file: " + outputFilePath);
+            }
             ProcessBuilder pb = new ProcessBuilder(
-                    "ffmpeg", "-i", filePath, "-af", "afftdn", outputFilePath);
+                    "ffmpeg", "-y", "-i", filePath, "-af", "afftdn", outputFilePath);
             runProcess(pb);
             return outputFilePath;
         } catch (Exception e) {
@@ -101,6 +167,7 @@ public class AudioProcessingService {
     }
 
     private void runProcess(ProcessBuilder pb) throws Exception {
+        System.out.println("Run process");
         pb.redirectErrorStream(true);
         Process process = pb.start();
         int exitCode = process.waitFor();

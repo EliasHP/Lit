@@ -48,15 +48,16 @@ public class AudioController {
 
             // Update request with the server path
             request.setFilePath(filePath);
-
+            System.out.println("We got here" + filePath);
             // Process the file
             String processedFilePath = audioProcessingService.processAudio(request);
-
+            System.out.println("We got here 2" + processedFilePath);
             // Convert the processed file path to a URL
             String processedFileName = new File(processedFilePath).getName();
             String processedFileUrl = "http://localhost:8080/" + processedFileName;
 
             // Return JSON with the URL
+            System.out.println("returning url as: " + processedFileUrl);
             return ResponseEntity.ok(Map.of("url", processedFileUrl));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Error processing audio: " + e.getMessage()));
