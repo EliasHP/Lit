@@ -10,6 +10,7 @@ class UnifiedAudioPlayer extends LitElement {
     volume: { type: Number },
     startPoint: { type: Number },
     endPoint: { type: Number },
+    showAudioTuner: { type: Boolean }, 
   };
 
   static styles = css`
@@ -81,17 +82,24 @@ class UnifiedAudioPlayer extends LitElement {
       font-size: 12px;
       color: #555;
     }
+  .file-name-container {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: center;
+  }
   `;
 
   constructor() {
     super();
     this.src = '';
-    this.isLooping = false;
+    this.isLooping = true;
     this.playbackRate = 1.0;
     this.volume = 1.0;
     this.startPoint = 0;
     this.endPoint = null;
     this.waveSurfer = null;
+    this.showAudioTuner = false;
     this.handleKeyPress = this.handleKeyPress.bind(this);
   }
 
@@ -170,8 +178,6 @@ disconnectedCallback() {
     this.updateFileSource(newFilePath);
 }
 
-
-
   updated(changedProperties) {
     if (changedProperties.has('src')) {
       if (this.src) {
@@ -189,6 +195,7 @@ disconnectedCallback() {
       this.requestUpdate();
     });
   }
+
   // Swap the file dynamically after processing
   updateFileSource(newSrc) {
     if (!newSrc) {
@@ -257,6 +264,17 @@ disconnectedCallback() {
       }
     }
   }
+  getFileName() {
+    if (!this.src) {
+      return 'No file loaded';
+    }
+    const fileName = this.src.split('/').pop(); 
+    return decodeURIComponent(fileName); 
+  }
+  
+  toggleAudioTuner() {
+    this.showAudioTuner = !this.showAudioTuner;
+  }
 
   render() {
     const waveformWidth = this.waveSurfer?.getDuration()
@@ -271,6 +289,9 @@ disconnectedCallback() {
 
     return html`
       <div class="player-container">
+        <div class="file-name-container">
+          <span>${this.getFileName()}</span>
+        </div>
         <div class="waveform-container">
           <div
             class="waveform-overlay"
@@ -364,9 +385,12 @@ disconnectedCallback() {
           </div>
 
         </div>
-        <audio-tuner
-          .filePath="${this.src}" 
-        ></audio-tuner>
+        <button class="toggle-button" @click="${this.toggleAudioTuner}">
+          ${this.showAudioTuner ? 'Hide Audio Tuner' : 'Show Audio Tuner'}
+        </button>
+        ${this.showAudioTuner
+          ? html`<audio-tuner .filePath="${this.src}"></audio-tuner>`
+          : ''}
     `;
   }
 }

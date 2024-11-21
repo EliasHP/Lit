@@ -17,7 +17,7 @@ class AudioTuner extends LitElement {
     .tuner-container {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 15px;
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 5px;
@@ -26,17 +26,25 @@ class AudioTuner extends LitElement {
 
     .slider-container {
       display: flex;
-      flex-direction: column;
-      gap: 5px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
 
     label {
       font-size: 0.9rem;
       color: #333;
+      width: 30%;
+      text-align: right;
     }
 
-    input[type='range'], input[type='number'] {
-      width: 100%;
+    input[type='range'] {
+      width: 60%;
+    }
+
+    .numeric-input {
+      width: 50px;
+      text-align: center;
     }
 
     button {
@@ -52,6 +60,7 @@ class AudioTuner extends LitElement {
       background-color: #ccc;
     }
   `;
+
 
   constructor() {
     super();
@@ -125,6 +134,15 @@ class AudioTuner extends LitElement {
             .value="${this.pitchFactor}"
             @input="${(e) => (this.pitchFactor = parseFloat(e.target.value))}"
           />
+          <input
+            class="numeric-input"
+            type="number"
+            min="0.5"
+            max="2"
+            step="0.1"
+            .value="${this.pitchFactor}"
+            @input="${(e) => (this.pitchFactor = parseFloat(e.target.value))}"
+          />
         </div>
 
         <div class="slider-container">
@@ -135,20 +153,37 @@ class AudioTuner extends LitElement {
             max="3"
             step="0.1"
             .value="${this.amplificationFactor}"
-            @input="${(e) =>
-              (this.amplificationFactor = parseFloat(e.target.value))}"
+            @input="${(e) => (this.amplificationFactor = parseFloat(e.target.value))}"
+          />
+          <input
+            class="numeric-input"
+            type="number"
+            min="0.1"
+            max="3"
+            step="0.1"
+            .value="${this.amplificationFactor}"
+            @input="${(e) => (this.amplificationFactor = parseFloat(e.target.value))}"
           />
         </div>
 
         <div class="slider-container">
           <label>Compression Threshold (dB)</label>
           <input
+            type="range"
+            min="-50"
+            max="0"
+            step="1"
+            .value="${this.compressionThreshold}"
+            @input="${(e) => (this.compressionThreshold = parseFloat(e.target.value))}"
+          />
+          <input
+            class="numeric-input"
             type="number"
             min="-50"
             max="0"
+            step="1"
             .value="${this.compressionThreshold}"
-            @input="${(e) =>
-              (this.compressionThreshold = parseFloat(e.target.value))}"
+            @input="${(e) => (this.compressionThreshold = parseFloat(e.target.value))}"
           />
         </div>
 
@@ -160,34 +195,58 @@ class AudioTuner extends LitElement {
             max="10"
             step="0.1"
             .value="${this.compressionRatio}"
-            @input="${(e) =>
-              (this.compressionRatio = parseFloat(e.target.value))}"
+            @input="${(e) => (this.compressionRatio = parseFloat(e.target.value))}"
+          />
+          <input
+            class="numeric-input"
+            type="number"
+            min="1"
+            max="10"
+            step="0.1"
+            .value="${this.compressionRatio}"
+            @input="${(e) => (this.compressionRatio = parseFloat(e.target.value))}"
           />
         </div>
 
         <div class="slider-container">
           <label>Filter Frequency (Hz)</label>
           <input
+            type="range"
+            min="20"
+            max="20000"
+            step="100"
+            .value="${this.filterFrequency}"
+            @input="${(e) => (this.filterFrequency = parseFloat(e.target.value))}"
+          />
+          <input
+            class="numeric-input"
             type="number"
             min="20"
             max="20000"
             step="100"
             .value="${this.filterFrequency}"
-            @input="${(e) =>
-              (this.filterFrequency = parseFloat(e.target.value))}"
+            @input="${(e) => (this.filterFrequency = parseFloat(e.target.value))}"
           />
         </div>
 
         <div class="slider-container">
           <label>Filter Bandwidth</label>
           <input
+            type="range"
+            min="10"
+            max="5000"
+            step="10"
+            .value="${this.filterBandwidth}"
+            @input="${(e) => (this.filterBandwidth = parseFloat(e.target.value))}"
+          />
+          <input
+            class="numeric-input"
             type="number"
             min="10"
             max="5000"
             step="10"
             .value="${this.filterBandwidth}"
-            @input="${(e) =>
-              (this.filterBandwidth = parseFloat(e.target.value))}"
+            @input="${(e) => (this.filterBandwidth = parseFloat(e.target.value))}"
           />
         </div>
 
