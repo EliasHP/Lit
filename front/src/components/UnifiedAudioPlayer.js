@@ -276,7 +276,14 @@ disconnectedCallback() {
   toggleAudioTuner() {
     this.showAudioTuner = !this.showAudioTuner;
   }
-
+  getOriginalFileName() {
+    if (this.src) {
+      const fileName = this.src.split('/').pop();
+      return fileName.replace('_pitch.mp3', '.mp3');
+    }
+    return 'No file loaded';
+  }
+  
   render() {
     const waveformWidth = this.waveSurfer?.getDuration()
       ? (this.startPoint / this.waveSurfer.getDuration()) * 100
@@ -392,7 +399,9 @@ disconnectedCallback() {
         ${this.showAudioTuner
           ? html`<audio-tuner .filePath="${this.src}"></audio-tuner>`
           : ''}
-        <transcription-section .fileName="${this.getFileName()}"></transcription-section>
+        <transcription-section
+          .fileName="${this.getOriginalFileName()}"
+        ></transcription-section>
     `;
   }
 }

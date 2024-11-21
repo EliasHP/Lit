@@ -3,9 +3,23 @@ import { LitElement, html, css } from 'lit';
 class TranscriptionSection extends LitElement {
   static properties = {
     fileName: { type: String },
+    fromTime: { type: String },
+    toTime: { type: String },
+    transcriptionText: { type: String },
+    whisperText: { type: String },
   };
 
+  constructor() {
+    super();
+    this.fileName = '';
+    this.fromTime = '';
+    this.toTime = '';
+    this.transcriptionText = '';
+    this.whisperText = '';
+  }
+
   static styles = css`
+    /* Keep the existing styles */
     .transcription-section {
       gap: 1.5rem;
       width: 100%;
@@ -51,7 +65,84 @@ class TranscriptionSection extends LitElement {
       resize: vertical;
       padding-left: 20px;
     }
+
+    .save-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .save-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
   `;
+
+  // Fetch transcription data from the backend
+  async fetchTranscription() {
+    if (!this.fileName) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/transcriptions/${this.fileName}`
+      );
+      if (!response.ok) {
+        throw new Error(`Error fetching transcription: ${response.status}`);
+      }
+      const data = await response.json();
+      this.fromTime = data.from || '';
+      this.toTime = data.to || '';
+      this.transcriptionText = data.transcription || '';
+      this.whisperText = data.whisper || '';
+    } catch (error) {
+      console.error('Error fetching transcription:', error);
+      alert('Failed to fetch transcription. Check the logs for details.');
+    }
+  }
+
+  // Save transcription data to the backend
+  async saveTranscription() {
+    if (!this.fileName) {
+      alert('No file selected');
+      return;
+    }
+
+    const payload = {
+      fileName: this.fileName.replace('_pitch.mp3', '.mp3'), // Remove _pitch suffix
+      from: this.fromTime,
+      to: this.toTime,
+      transcription: this.transcriptionText,
+    };
+
+    try {
+      const response = await fetch('http://localhost:8080/api/transcriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      alert('Transcription saved successfully!');
+    } catch (error) {
+      console.error('Error saving transcription:', error);
+      alert('Failed to save transcription. Check the logs for details.');
+    }
+  }
+
+  // Trigger fetching when `fileName` changes
+  updated(changedProperties) {
+    if (changedProperties.has('fileName')) {
+      this.fetchTranscription();
+    }
+  }
 
   render() {
     return html`
@@ -61,20 +152,43 @@ class TranscriptionSection extends LitElement {
           <div class="time-inputs">
             <div class="time-input">
               <label>From:</label>
-              <input type="text" />
+              <input
+                type="text"
+                .value="${this.fromTime}"
+                @input="${(e) => (this.fromTime = e.target.value)}"
+              />
             </div>
             <div class="time-input">
               <label>To:</label>
-              <input type="text" />
+              <input
+                type="text"
+                .value="${this.toTime}"
+                @input="${(e) => (this.toTime = e.target.value)}"
+              />
             </div>
           </div>
         </div>
         <div class="textarea-section">
-          <textarea placeholder="Write what you hear"></textarea>
+          <textarea
+            placeholder="Write what you hear"
+            .value="${this.transcriptionText}"
+            @input="${(e) => (this.transcriptionText = e.target.value)}"
+          ></textarea>
         </div>
         <div class="whisper-section">
-          <textarea placeholder="What Whisper heard" readonly></textarea>
+          <textarea
+            placeholder="What Whisper heard"
+            readonly
+            .value="${this.whisperText}"
+          ></textarea>
         </div>
+        <button
+          class="save-button"
+          @click="${this.saveTranscription}"
+          ?disabled="${!this.fileName}"
+        >
+          Save Transcription
+        </button>
       </div>
     `;
   }

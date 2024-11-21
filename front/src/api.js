@@ -55,3 +55,24 @@ export async function processAudio(params) {
   }
 }
 
+export async function saveTranscription({ fileName, from, to, text }) {
+  const response = await fetch('/api/transcription/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      fileName,
+      from,
+      to,
+      text,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to save transcription: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
