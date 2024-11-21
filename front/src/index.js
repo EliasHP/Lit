@@ -202,29 +202,6 @@ render() {
             <unified-audio-player
               .src="${this.selectedFile ? this.selectedFile.url : ''}"
             ></unified-audio-player>
-            
-
-            <div class="transcription-section">
-
-                <div class="write-section">
-                  <div class="time-inputs">
-                    <div class="time-input">
-                      <label>From:</label>
-                      <input type="text" />
-                    </div>
-                    <div class="time-input">
-                      <label>To:</label>
-                      <input type="text" />
-                    </div>
-                  </div>
-                </div>
-                <div class="textarea-section">
-                  <textarea placeholder="Write what you hear"></textarea>
-                </div>
-                <div class="whisper-section">
-                  <textarea placeholder="What Whisper heard" readonly></textarea>
-              </div>
-            </div>
           </div>
         </div>
       </div>

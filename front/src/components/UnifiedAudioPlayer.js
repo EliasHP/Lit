@@ -1,5 +1,6 @@
 import WaveSurfer from 'wavesurfer.js';
 import './AudioTuner.js';
+import './TranscriptionSection.js';
 import { LitElement, html, css } from 'lit';
 
 class UnifiedAudioPlayer extends LitElement {
@@ -271,7 +272,7 @@ disconnectedCallback() {
     const fileName = this.src.split('/').pop(); 
     return decodeURIComponent(fileName); 
   }
-  
+
   toggleAudioTuner() {
     this.showAudioTuner = !this.showAudioTuner;
   }
@@ -391,6 +392,7 @@ disconnectedCallback() {
         ${this.showAudioTuner
           ? html`<audio-tuner .filePath="${this.src}"></audio-tuner>`
           : ''}
+        <transcription-section .fileName="${this.getFileName()}"></transcription-section>
     `;
   }
 }
