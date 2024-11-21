@@ -83,25 +83,27 @@ class TranscriptionSection extends LitElement {
 
   // Fetch transcription data from the backend
   async fetchTranscription() {
-    if (!this.fileName) return;
-
+    if (!this.fileName || this.fileName === 'No file loaded') {
+      console.warn('No valid file name provided for fetching transcription.');
+      return; // Skip fetching if no valid file name
+    }
+  
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/transcriptions/${this.fileName}`
-      );
+      const response = await fetch(`http://localhost:8080/api/transcriptions/${this.fileName}`);
       if (!response.ok) {
         throw new Error(`Error fetching transcription: ${response.status}`);
       }
+  
       const data = await response.json();
-      this.fromTime = data.from || '';
-      this.toTime = data.to || '';
-      this.transcriptionText = data.transcription || '';
+      this.fromTime = data.from;
+      this.toTime = data.to;
+      this.transcriptionText = data.transcription;
       this.whisperText = data.whisper || '';
     } catch (error) {
       console.error('Error fetching transcription:', error);
-      alert('Failed to fetch transcription. Check the logs for details.');
     }
   }
+  
 
   // Save transcription data to the backend
   async saveTranscription() {
