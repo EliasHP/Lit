@@ -114,7 +114,7 @@ class TranscriptionSection extends LitElement {
     }
 
     const payload = {
-      fileName: this.fileName.replace("_pitch.mp3", ".mp3"), // Remove _pitch suffix
+      fileName: this.fileName.replace("_denoised.mp3", ".mp3"), // Remove _denoise suffix from edited files so we still make marking on the og file
       from: this.fromTime,
       to: this.toTime,
       transcription: this.transcriptionText,

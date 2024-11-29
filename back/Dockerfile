@@ -1,5 +1,6 @@
-# Option 2: Use Debian-based OpenJDK image
+# Debian-based OpenJDK image
 FROM openjdk:23-jdk-slim
+
 # Install ffmpeg on Debian/Ubuntu
 RUN apt-get update && \
     apt-get install -y ffmpeg && \

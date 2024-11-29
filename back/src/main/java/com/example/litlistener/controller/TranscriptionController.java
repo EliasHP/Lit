@@ -2,7 +2,6 @@ package com.example.litlistener.controller;
 
 import com.example.litlistener.request.TranscriptionRequest;
 import com.example.litlistener.response.TranscriptionResponse;
-import com.example.litlistener.entity.Transcription;
 import com.example.litlistener.service.TranscriptionService;
 
 import org.springframework.beans.factory.annotation.Autowired;

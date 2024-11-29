@@ -1,4 +1,4 @@
-package com.example.litlistener;
+package com.example.litlistener.response;
 
 public class AudioProcessingResponse {
     private String processedFilePath;
