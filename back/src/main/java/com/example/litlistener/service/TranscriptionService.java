@@ -6,9 +6,7 @@ import com.example.litlistener.response.TranscriptionResponse;
 import com.example.litlistener.repository.AudioFileRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.stereotype.Repository;
 
 @Service
 public class TranscriptionService {

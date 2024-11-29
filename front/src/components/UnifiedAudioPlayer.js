@@ -1,7 +1,7 @@
-import WaveSurfer from 'wavesurfer.js';
-import './AudioTuner.js';
-import './TranscriptionSection.js';
-import { LitElement, html, css } from 'lit';
+import WaveSurfer from "wavesurfer.js";
+import "./AudioTuner.js";
+import "./TranscriptionSection.js";
+import { LitElement, html, css } from "lit";
 
 class UnifiedAudioPlayer extends LitElement {
   static properties = {
@@ -11,7 +11,7 @@ class UnifiedAudioPlayer extends LitElement {
     volume: { type: Number },
     startPoint: { type: Number },
     endPoint: { type: Number },
-    showAudioTuner: { type: Boolean }, 
+    showAudioTuner: { type: Boolean },
   };
 
   static styles = css`
@@ -59,7 +59,7 @@ class UnifiedAudioPlayer extends LitElement {
       margin-top: 10px;
       width: 100%;
     }
-    input[type='range'] {
+    input[type="range"] {
       width: 100%;
     }
     .slider-container {
@@ -83,17 +83,17 @@ class UnifiedAudioPlayer extends LitElement {
       font-size: 12px;
       color: #555;
     }
-  .file-name-container {
-    font-size: 1rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-    text-align: center;
-  }
+    .file-name-container {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-align: center;
+    }
   `;
 
   constructor() {
     super();
-    this.src = '';
+    this.src = "";
     this.isLooping = true;
     this.playbackRate = 1.0;
     this.volume = 1.0;
@@ -104,51 +104,57 @@ class UnifiedAudioPlayer extends LitElement {
     this.handleKeyPress = this.handleKeyPress.bind(this);
   }
 
-connectedCallback() {
+  connectedCallback() {
     super.connectedCallback();
 
     // Add keydown listener
     if (!this.boundHandleKeyPress) {
-        this.boundHandleKeyPress = this.handleKeyPress.bind(this);
-        document.addEventListener('keydown', this.boundHandleKeyPress);
+      this.boundHandleKeyPress = this.handleKeyPress.bind(this);
+      document.addEventListener("keydown", this.boundHandleKeyPress);
     }
 
     // Add file-processed listener
     if (!this.boundHandleFileProcessed) {
-        this.boundHandleFileProcessed = this.handleFileProcessed.bind(this);
-        document.addEventListener('file-processed', this.boundHandleFileProcessed);
+      this.boundHandleFileProcessed = this.handleFileProcessed.bind(this);
+      document.addEventListener(
+        "file-processed",
+        this.boundHandleFileProcessed,
+      );
     }
-}
+  }
 
-disconnectedCallback() {
+  disconnectedCallback() {
     // Remove keydown listener
     if (this.boundHandleKeyPress) {
-        document.removeEventListener('keydown', this.boundHandleKeyPress);
-        this.boundHandleKeyPress = null;
+      document.removeEventListener("keydown", this.boundHandleKeyPress);
+      this.boundHandleKeyPress = null;
     }
 
     // Remove file-processed listener
     if (this.boundHandleFileProcessed) {
-        document.removeEventListener('file-processed', this.boundHandleFileProcessed);
-        this.boundHandleFileProcessed = null;
+      document.removeEventListener(
+        "file-processed",
+        this.boundHandleFileProcessed,
+      );
+      this.boundHandleFileProcessed = null;
     }
 
     super.disconnectedCallback();
-}
+  }
 
   firstUpdated() {
     this.waveSurfer = WaveSurfer.create({
-      container: this.shadowRoot.querySelector('.waveform-container'),
-      waveColor: '#757575',
-      progressColor: '#007bff',
-      backend: 'WebAudio',
+      container: this.shadowRoot.querySelector(".waveform-container"),
+      waveColor: "#757575",
+      progressColor: "#007bff",
+      backend: "WebAudio",
     });
 
     if (this.src) {
       this.loadAudio();
     }
 
-    this.waveSurfer.on('audioprocess', () => {
+    this.waveSurfer.on("audioprocess", () => {
       if (
         this.isLooping &&
         this.endPoint !== null &&
@@ -159,28 +165,27 @@ disconnectedCallback() {
       }
     });
 
-    this.waveSurfer.on('ready', () => {
+    this.waveSurfer.on("ready", () => {
       this.endPoint = this.waveSurfer.getDuration();
       this.requestUpdate();
     });
   }
 
-
   handleFileProcessed(event) {
-    console.log('File-processed event received:', event);
+    console.log("File-processed event received:", event);
     const newFilePath = event.detail?.newFilePath;
 
     if (!newFilePath) {
-        console.error('No new file path provided in file-processed event');
-        return;
+      console.error("No new file path provided in file-processed event");
+      return;
     }
 
     console.log(`Processed file path received: ${newFilePath}`);
     this.updateFileSource(newFilePath);
-}
+  }
 
   updated(changedProperties) {
-    if (changedProperties.has('src')) {
+    if (changedProperties.has("src")) {
       if (this.src) {
         this.loadAudio();
       } else if (this.waveSurfer) {
@@ -191,7 +196,7 @@ disconnectedCallback() {
 
   loadAudio() {
     this.waveSurfer.load(this.src);
-    this.waveSurfer.on('ready', () => {
+    this.waveSurfer.on("ready", () => {
       this.endPoint = this.waveSurfer.getDuration();
       this.requestUpdate();
     });
@@ -200,16 +205,16 @@ disconnectedCallback() {
   // Swap the file dynamically after processing
   updateFileSource(newSrc) {
     if (!newSrc) {
-        console.error('No source provided to updateFileSource!');
-        return;
+      console.error("No source provided to updateFileSource!");
+      return;
     }
 
     console.log(`Updating file source to: ${newSrc}`);
     this.src = newSrc;
-    this.waveSurfer.empty(); 
-    this.waveSurfer.load(this.src); 
-}
-  
+    this.waveSurfer.empty();
+    this.waveSurfer.load(this.src);
+  }
+
   playAudio() {
     this.waveSurfer.play(this.startPoint, this.endPoint);
   }
@@ -244,19 +249,16 @@ disconnectedCallback() {
   setStartPoint(event) {
     this.startPoint = Math.min(
       parseFloat(event.target.value),
-      this.endPoint || this.waveSurfer.getDuration()
+      this.endPoint || this.waveSurfer.getDuration(),
     );
   }
 
   setEndPoint(event) {
-    this.endPoint = Math.max(
-      parseFloat(event.target.value),
-      this.startPoint
-    );
+    this.endPoint = Math.max(parseFloat(event.target.value), this.startPoint);
   }
 
   handleKeyPress(event) {
-    if (event.code === 'Space') {
+    if (event.code === "Space") {
       event.preventDefault();
       if (this.waveSurfer.isPlaying()) {
         this.pauseAudio();
@@ -267,10 +269,10 @@ disconnectedCallback() {
   }
   getFileName() {
     if (!this.src) {
-      return 'No file loaded';
+      return "No file loaded";
     }
-    const fileName = this.src.split('/').pop(); 
-    return decodeURIComponent(fileName); 
+    const fileName = this.src.split("/").pop();
+    return decodeURIComponent(fileName);
   }
 
   toggleAudioTuner() {
@@ -278,12 +280,12 @@ disconnectedCallback() {
   }
   getOriginalFileName() {
     if (this.src) {
-      const fileName = this.src.split('/').pop();
-      return fileName.replace('_pitch.mp3', '.mp3');
+      const fileName = this.src.split("/").pop();
+      return fileName.replace("_pitch.mp3", ".mp3");
     }
-    return 'No file loaded';
+    return "No file loaded";
   }
-  
+
   render() {
     const waveformWidth = this.waveSurfer?.getDuration()
       ? (this.startPoint / this.waveSurfer.getDuration()) * 100
@@ -307,9 +309,12 @@ disconnectedCallback() {
           ></div>
           <div class="start-end-labels">
             <span>Start: ${this.startPoint.toFixed(2)}s</span>
-            <span>End: ${this.endPoint
-              ? this.endPoint.toFixed(2) + 's'
-              : 'Full Length'}</span>
+            <span
+              >End:
+              ${this.endPoint
+                ? this.endPoint.toFixed(2) + "s"
+                : "Full Length"}</span
+            >
           </div>
         </div>
         <div class="controls">
@@ -319,9 +324,9 @@ disconnectedCallback() {
           <button @click="${this.rewindAudio}">Rewind 5s</button>
           <button
             @click="${this.toggleLoop}"
-            style="background-color: ${this.isLooping ? '#28a745' : '#007bff'}"
+            style="background-color: ${this.isLooping ? "#28a745" : "#007bff"}"
           >
-            Loop: ${this.isLooping ? 'On' : 'Off'}
+            Loop: ${this.isLooping ? "On" : "Off"}
           </button>
         </div>
         <div class="sliders">
@@ -389,21 +394,20 @@ disconnectedCallback() {
               .value="${this.endPoint || this.waveSurfer?.getDuration()}"
               @input="${this.setEndPoint}"
             />
-            
           </div>
-
         </div>
         <button class="toggle-button" @click="${this.toggleAudioTuner}">
-          ${this.showAudioTuner ? 'Hide Audio Tuner' : 'Show Audio Tuner'}
+          ${this.showAudioTuner ? "Hide Audio Tuner" : "Show Audio Tuner"}
         </button>
         ${this.showAudioTuner
           ? html`<audio-tuner .filePath="${this.src}"></audio-tuner>`
-          : ''}
+          : ""}
         <transcription-section
           .fileName="${this.getOriginalFileName()}"
         ></transcription-section>
+      </div>
     `;
   }
 }
 
-customElements.define('unified-audio-player', UnifiedAudioPlayer);
+customElements.define("unified-audio-player", UnifiedAudioPlayer);

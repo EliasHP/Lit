@@ -1,11 +1,11 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css } from "lit";
 
 export class SideMenu extends LitElement {
   static styles = css`
     :host {
       display: block;
     }
-    
+
     .side-menu {
       width: 250px;
       height: 100%;
@@ -61,9 +61,9 @@ export class SideMenu extends LitElement {
 
   render() {
     return html`
-      <div class="side-menu ${this.collapsed ? 'collapsed' : ''}">
+      <div class="side-menu ${this.collapsed ? "collapsed" : ""}">
         <button class="toggle-button" @click="${this.toggleMenu}">
-          ${this.collapsed ? '→' : '←'}
+          ${this.collapsed ? "→" : "←"}
         </button>
         <div class="menu-content">
           <slot></slot>
@@ -73,4 +73,4 @@ export class SideMenu extends LitElement {
   }
 }
 
-customElements.define('side-menu', SideMenu);
+customElements.define("side-menu", SideMenu);

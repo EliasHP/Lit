@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css } from "lit";
 
 class AudioFileList extends LitElement {
   static properties = {
@@ -11,7 +11,7 @@ class AudioFileList extends LitElement {
       padding: 0;
       margin: 0;
     }
-      .audio-list-container {
+    .audio-list-container {
       max-height: 80vh; /* Adjust the height relative to the viewport */
       overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
       border: 1px solid #ddd;
@@ -37,17 +37,16 @@ class AudioFileList extends LitElement {
   }
 
   willUpdate(changedProperties) {
-    if (changedProperties.has('audioFiles')) {
+    if (changedProperties.has("audioFiles")) {
       // Optional: Add any preprocessing of audioFiles here if needed
-      console.log('Audio files updated:', this.audioFiles);
+      console.log("Audio files updated:", this.audioFiles);
     }
   }
   handleFileClick(file) {
-    console.log('File clicked:', file); // Debug log
-    this.dispatchEvent(new CustomEvent('file-selected', { detail: file }));
+    console.log("File clicked:", file); // Debug log
+    this.dispatchEvent(new CustomEvent("file-selected", { detail: file }));
   }
-  
-  
+
   generateFileList() {
     if (!this.audioFiles || this.audioFiles.length === 0) {
       return html`<li>No audio files found.</li>`;
@@ -59,19 +58,19 @@ class AudioFileList extends LitElement {
           <span>${file.name}</span>
           <span>${file.path}</span>
         </li>
-      `
+      `,
     );
   }
 
   render() {
     return html`
-    <div class="audio-list-container">
-      <ul class="audio-list">
-        ${this.generateFileList()}
-      </ul>
-    </div>
+      <div class="audio-list-container">
+        <ul class="audio-list">
+          ${this.generateFileList()}
+        </ul>
+      </div>
     `;
   }
 }
 
-customElements.define('audio-file-list', AudioFileList);
+customElements.define("audio-file-list", AudioFileList);

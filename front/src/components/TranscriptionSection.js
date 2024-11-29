@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css } from "lit";
 
 class TranscriptionSection extends LitElement {
   static properties = {
@@ -11,11 +11,11 @@ class TranscriptionSection extends LitElement {
 
   constructor() {
     super();
-    this.fileName = '';
-    this.fromTime = '';
-    this.toTime = '';
-    this.transcriptionText = '';
-    this.whisperText = '';
+    this.fileName = "";
+    this.fromTime = "";
+    this.toTime = "";
+    this.transcriptionText = "";
+    this.whisperText = "";
   }
 
   static styles = css`
@@ -83,47 +83,48 @@ class TranscriptionSection extends LitElement {
 
   // Fetch transcription data from the backend
   async fetchTranscription() {
-    if (!this.fileName || this.fileName === 'No file loaded') {
-      console.warn('No valid file name provided for fetching transcription.');
+    if (!this.fileName || this.fileName === "No file loaded") {
+      console.warn("No valid file name provided for fetching transcription.");
       return; // Skip fetching if no valid file name
     }
-  
+
     try {
-      const response = await fetch(`http://localhost:8080/api/transcriptions/${this.fileName}`);
+      const response = await fetch(
+        `http://localhost:8080/api/transcriptions/${this.fileName}`,
+      );
       if (!response.ok) {
         throw new Error(`Error fetching transcription: ${response.status}`);
       }
-  
+
       const data = await response.json();
       this.fromTime = data.from;
       this.toTime = data.to;
       this.transcriptionText = data.transcription;
-      this.whisperText = data.whisper || '';
+      this.whisperText = data.whisper || "";
     } catch (error) {
-      console.error('Error fetching transcription:', error);
+      console.error("Error fetching transcription:", error);
     }
   }
-  
 
   // Save transcription data to the backend
   async saveTranscription() {
     if (!this.fileName) {
-      alert('No file selected');
+      alert("No file selected");
       return;
     }
 
     const payload = {
-      fileName: this.fileName.replace('_pitch.mp3', '.mp3'), // Remove _pitch suffix
+      fileName: this.fileName.replace("_pitch.mp3", ".mp3"), // Remove _pitch suffix
       from: this.fromTime,
       to: this.toTime,
       transcription: this.transcriptionText,
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/transcriptions', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8080/api/transcriptions", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
@@ -132,16 +133,16 @@ class TranscriptionSection extends LitElement {
         throw new Error(`Error: ${response.status}`);
       }
 
-      alert('Transcription saved successfully!');
+      alert("Transcription saved successfully!");
     } catch (error) {
-      console.error('Error saving transcription:', error);
-      alert('Failed to save transcription. Check the logs for details.');
+      console.error("Error saving transcription:", error);
+      alert("Failed to save transcription. Check the logs for details.");
     }
   }
 
   // Trigger fetching when `fileName` changes
   updated(changedProperties) {
-    if (changedProperties.has('fileName')) {
+    if (changedProperties.has("fileName")) {
       this.fetchTranscription();
     }
   }
@@ -149,7 +150,7 @@ class TranscriptionSection extends LitElement {
   render() {
     return html`
       <div class="transcription-section">
-        <h4>Transcription for: ${this.fileName || 'No file loaded'}</h4>
+        <h4>Transcription for: ${this.fileName || "No file loaded"}</h4>
         <div class="write-section">
           <div class="time-inputs">
             <div class="time-input">
@@ -196,4 +197,4 @@ class TranscriptionSection extends LitElement {
   }
 }
 
-customElements.define('transcription-section', TranscriptionSection);
+customElements.define("transcription-section", TranscriptionSection);

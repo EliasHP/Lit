@@ -1,5 +1,5 @@
-import { LitElement, html, css } from 'lit';
-import { processAudio } from './../api';
+import { LitElement, html, css } from "lit";
+import { processAudio } from "./../api";
 
 class AudioTuner extends LitElement {
   static properties = {
@@ -38,7 +38,7 @@ class AudioTuner extends LitElement {
       text-align: right;
     }
 
-    input[type='range'] {
+    input[type="range"] {
       width: 60%;
     }
 
@@ -61,7 +61,6 @@ class AudioTuner extends LitElement {
     }
   `;
 
-
   constructor() {
     super();
     this.pitchFactor = 1.0;
@@ -70,12 +69,12 @@ class AudioTuner extends LitElement {
     this.compressionRatio = 2.0;
     this.filterFrequency = 1000;
     this.filterBandwidth = 200;
-    this.processingType = 'pitch';
+    this.processingType = "pitch";
   }
 
   async processAudioFile() {
     try {
-      console.log('Processing audio with params:', {
+      console.log("Processing audio with params:", {
         type: this.processingType,
         filePath: this.filePath,
         pitchFactor: this.pitchFactor,
@@ -85,10 +84,10 @@ class AudioTuner extends LitElement {
         filterFrequency: this.filterFrequency,
         filterBandwidth: this.filterBandwidth,
       });
-  
+
       const params = {
         type: this.processingType,
-        filePath: this.filePath, 
+        filePath: this.filePath,
         pitchFactor: this.pitchFactor,
         amplificationFactor: this.amplificationFactor,
         compressionThreshold: this.compressionThreshold,
@@ -97,29 +96,27 @@ class AudioTuner extends LitElement {
         filterBandwidth: this.filterBandwidth,
       };
       // Stop playback if in progress
-      const audioPlayer = document.querySelector('unified-audio-player');
+      const audioPlayer = document.querySelector("unified-audio-player");
       if (audioPlayer) {
-          audioPlayer.pauseAudio(); // Assuming pauseAudio() exists
+        audioPlayer.pauseAudio(); // Assuming pauseAudio() exists
       }
 
       const response = await processAudio(params);
       const newFilePath = await response;
-  
-      console.log('Dispatching file-processed event with:', { newFilePath });
-      this.dispatchEvent(new CustomEvent('file-processed', {
+
+      console.log("Dispatching file-processed event with:", { newFilePath });
+      this.dispatchEvent(
+        new CustomEvent("file-processed", {
           detail: { newFilePath },
           bubbles: true,
           composed: true,
-      }));
-      
-      
+        }),
+      );
     } catch (error) {
-      console.error('Error processing audio:', error);
-      alert('Error processing audio. Please check the logs.');
+      console.error("Error processing audio:", error);
+      alert("Error processing audio. Please check the logs.");
     }
   }
-  
-
 
   render() {
     return html`
@@ -153,7 +150,8 @@ class AudioTuner extends LitElement {
             max="3"
             step="0.1"
             .value="${this.amplificationFactor}"
-            @input="${(e) => (this.amplificationFactor = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.amplificationFactor = parseFloat(e.target.value))}"
           />
           <input
             class="numeric-input"
@@ -162,7 +160,8 @@ class AudioTuner extends LitElement {
             max="3"
             step="0.1"
             .value="${this.amplificationFactor}"
-            @input="${(e) => (this.amplificationFactor = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.amplificationFactor = parseFloat(e.target.value))}"
           />
         </div>
 
@@ -174,7 +173,8 @@ class AudioTuner extends LitElement {
             max="0"
             step="1"
             .value="${this.compressionThreshold}"
-            @input="${(e) => (this.compressionThreshold = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.compressionThreshold = parseFloat(e.target.value))}"
           />
           <input
             class="numeric-input"
@@ -183,7 +183,8 @@ class AudioTuner extends LitElement {
             max="0"
             step="1"
             .value="${this.compressionThreshold}"
-            @input="${(e) => (this.compressionThreshold = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.compressionThreshold = parseFloat(e.target.value))}"
           />
         </div>
 
@@ -195,7 +196,8 @@ class AudioTuner extends LitElement {
             max="10"
             step="0.1"
             .value="${this.compressionRatio}"
-            @input="${(e) => (this.compressionRatio = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.compressionRatio = parseFloat(e.target.value))}"
           />
           <input
             class="numeric-input"
@@ -204,7 +206,8 @@ class AudioTuner extends LitElement {
             max="10"
             step="0.1"
             .value="${this.compressionRatio}"
-            @input="${(e) => (this.compressionRatio = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.compressionRatio = parseFloat(e.target.value))}"
           />
         </div>
 
@@ -216,7 +219,8 @@ class AudioTuner extends LitElement {
             max="20000"
             step="100"
             .value="${this.filterFrequency}"
-            @input="${(e) => (this.filterFrequency = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.filterFrequency = parseFloat(e.target.value))}"
           />
           <input
             class="numeric-input"
@@ -225,7 +229,8 @@ class AudioTuner extends LitElement {
             max="20000"
             step="100"
             .value="${this.filterFrequency}"
-            @input="${(e) => (this.filterFrequency = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.filterFrequency = parseFloat(e.target.value))}"
           />
         </div>
 
@@ -237,7 +242,8 @@ class AudioTuner extends LitElement {
             max="5000"
             step="10"
             .value="${this.filterBandwidth}"
-            @input="${(e) => (this.filterBandwidth = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.filterBandwidth = parseFloat(e.target.value))}"
           />
           <input
             class="numeric-input"
@@ -246,16 +252,15 @@ class AudioTuner extends LitElement {
             max="5000"
             step="10"
             .value="${this.filterBandwidth}"
-            @input="${(e) => (this.filterBandwidth = parseFloat(e.target.value))}"
+            @input="${(e) =>
+              (this.filterBandwidth = parseFloat(e.target.value))}"
           />
         </div>
 
-        <button @click="${this.processAudioFile}">
-          Process Audio
-        </button>
+        <button @click="${this.processAudioFile}">Process Audio</button>
       </div>
     `;
   }
 }
 
-customElements.define('audio-tuner', AudioTuner);
+customElements.define("audio-tuner", AudioTuner);

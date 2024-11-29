@@ -1,4 +1,4 @@
-package com.example.litlistener;
+package com.example.litlistener.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.litlistener.entity.AudioFile;
 import com.example.litlistener.repository.AudioFileRepository;
+import com.example.litlistener.request.AudioProcessingRequest;
+import com.example.litlistener.service.AudioProcessingService;
 
 import java.util.List;
 import java.util.Map;

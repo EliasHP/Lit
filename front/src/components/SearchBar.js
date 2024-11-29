@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css } from "lit";
 
 class SearchBar extends LitElement {
   static properties = {
@@ -19,7 +19,7 @@ class SearchBar extends LitElement {
 
   constructor() {
     super();
-    this.placeholder = 'Search audio files...';
+    this.placeholder = "Search audio files...";
     this.onSearch = () => {};
   }
 
@@ -39,4 +39,4 @@ class SearchBar extends LitElement {
   }
 }
 
-customElements.define('search-bar', SearchBar);
+customElements.define("search-bar", SearchBar);

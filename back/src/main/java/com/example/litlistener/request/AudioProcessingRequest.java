@@ -1,4 +1,4 @@
-package com.example.litlistener;
+package com.example.litlistener.request;
 
 public class AudioProcessingRequest {
     private String filePath;
