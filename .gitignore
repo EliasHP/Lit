@@ -30,11 +30,11 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
+vscode/
 .vscode/
-
-
 # Ignore all files in the audio folder
 back/src/main/audio/*
-
+back/src/audio/*
+!back/src/audio/.gitkeep
 # But do not ignore the folder itself
 !back/src/main/audio/.gitkeep
