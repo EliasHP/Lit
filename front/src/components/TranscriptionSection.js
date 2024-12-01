@@ -1,5 +1,5 @@
 import { LitElement, html, css } from "lit";
-
+import { clearTranscription } from "./../api";
 class TranscriptionSection extends LitElement {
   static properties = {
     fileName: { type: String },
@@ -7,6 +7,8 @@ class TranscriptionSection extends LitElement {
     toTime: { type: String },
     transcriptionText: { type: String },
     whisperText: { type: String },
+    tag: { type: String },
+    field: { type: String },
   };
 
   constructor() {
@@ -16,6 +18,8 @@ class TranscriptionSection extends LitElement {
     this.toTime = "";
     this.transcriptionText = "";
     this.whisperText = "";
+    this.tag = "";
+    this.field = "";
   }
 
   static styles = css`
@@ -79,6 +83,9 @@ class TranscriptionSection extends LitElement {
       background-color: #ccc;
       cursor: not-allowed;
     }
+    .additional-fields {
+      margin-bottom: 20px;
+    }
   `;
 
   // Fetch transcription data from the backend
@@ -118,6 +125,8 @@ class TranscriptionSection extends LitElement {
       from: this.fromTime,
       to: this.toTime,
       transcription: this.transcriptionText,
+      tag: this.tag,
+      field: this.field,
     };
 
     try {
@@ -146,12 +155,59 @@ class TranscriptionSection extends LitElement {
       this.fetchTranscription();
     }
   }
+  async clearTranscription() {
+    if (!this.fileName) {
+      alert("No file selected");
+      return;
+    }
+
+    try {
+      await clearTranscription(this.fileName.replace("_denoised.mp3", ".mp3"));
+      this.fromTime = "";
+      this.toTime = "";
+      this.transcriptionText = "";
+      this.whisperText = "";
+      alert("Transcription cleared successfully!");
+    } catch (error) {
+      console.error("Error clearing transcription:", error);
+      alert("Failed to clear transcription.");
+    }
+  }
 
   render() {
     return html`
       <div class="transcription-section">
-        <h4>Transcription for: ${this.fileName || "No file loaded"}</h4>
+        <h4>
+          Transcription for:
+          ${decodeURIComponent(this.fileName) || "No file loaded"}
+        </h4>
         <div class="write-section">
+          <div class="additional-fields">
+            <div>
+              <label for="tag">Tag:</label>
+              <select
+                id="tag"
+                .value="${this.tag}"
+                @change="${(e) => (this.tag = e.target.value)}"
+              >
+                <option value="SOT">SOT</option>
+                <option value="CIV">CIV</option>
+                <option value="UNKWN">UNKWN</option>
+              </select>
+              <label for="field">Field:</label>
+              <select
+                id="tag"
+                .value="${this.field}"
+                @change="${(e) => (this.tag = e.target.value)}"
+              >
+                <option value="GRND">GRND</option>
+                <option value="AIR">AIR</option>
+                <option value="SEA">SEA</option>
+                <option value="SIGNAL">SIGNAL</option>
+              </select>
+            </div>
+          </div>
+
           <div class="time-inputs">
             <div class="time-input">
               <label>From:</label>
@@ -191,6 +247,13 @@ class TranscriptionSection extends LitElement {
           ?disabled="${!this.fileName}"
         >
           Save Transcription
+        </button>
+        <button
+          class="save-button"
+          @click="${this.clearTranscription}"
+          ?disabled="${!this.fileName}"
+        >
+          Clear Transcription
         </button>
       </div>
     `;

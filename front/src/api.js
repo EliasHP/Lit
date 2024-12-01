@@ -74,3 +74,16 @@ export async function saveTranscription({ fileName, from, to, text }) {
 
   return response.json();
 }
+
+export async function clearTranscription(fileName) {
+  try {
+    const response = await fetch(`/api/transcriptions/clear/${fileName}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to clear transcription: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error("Error clearing transcription:", error);
+  }
+}

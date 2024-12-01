@@ -5,13 +5,18 @@ public class TranscriptionResponse {
     private String to;
     private String transcription;
     private String whisper;
+    private String tag;
+    private String field;
 
     // Constructor
-    public TranscriptionResponse(String from, String to, String transcription, String whisper) {
+    public TranscriptionResponse(String from, String to, String transcription, String whisper, String tag,
+            String field) {
         this.from = from;
         this.to = to;
         this.transcription = transcription;
         this.whisper = whisper;
+        this.tag = tag;
+        this.field = field;
     }
 
     // Getters and Setters
@@ -45,5 +50,21 @@ public class TranscriptionResponse {
 
     public void setWhisper(String whisper) {
         this.whisper = whisper;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public void setField(String field) {
+        this.field = field;
     }
 }

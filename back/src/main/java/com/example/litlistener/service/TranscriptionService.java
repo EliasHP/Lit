@@ -35,6 +35,8 @@ public class TranscriptionService {
                 audioFile.getFromField(),
                 audioFile.getToField(),
                 audioFile.getTranscript(),
-                audioFile.getWhisper());
+                audioFile.getWhisper(),
+                audioFile.getTag(),
+                audioFile.getField());
     }
 }
