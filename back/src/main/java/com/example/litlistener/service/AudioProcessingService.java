@@ -110,9 +110,12 @@ public class AudioProcessingService {
         return amplificationFactor > 0.1 && amplificationFactor < 5.0;
     }
 
-    private boolean isValidCompression(double threshold, double ratio) {
-        return threshold >= -60 && threshold <= 0 && ratio >= 1 && ratio <= 20;
-    }
+    /*
+     * to be implemented later when I google how this actually works
+     * private boolean isValidCompression(double threshold, double ratio) {
+     * return threshold >= -60 && threshold <= 0 && ratio >= 1 && ratio <= 20;
+     * }
+     */
 
     private boolean isValidFiltering(double frequency, double bandwidth) {
         return frequency >= 20 && frequency <= 20000 && bandwidth >= 10 && bandwidth <= 1000;
