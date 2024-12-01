@@ -23,6 +23,8 @@ public class TranscriptionService {
         audioFile.setFromField(request.getFrom());
         audioFile.setToField(request.getTo());
         audioFile.setTranscript(request.getTranscription());
+        audioFile.setTag(request.getTag());
+        audioFile.setField(request.getField());
         audioFileRepository.save(audioFile);
     }
 

@@ -108,6 +108,8 @@ class TranscriptionSection extends LitElement {
       this.toTime = data.to;
       this.transcriptionText = data.transcription;
       this.whisperText = data.whisper || "";
+      this.tag = data.tag || "";
+      this.field = data.field || "";
     } catch (error) {
       console.error("Error fetching transcription:", error);
     }
@@ -190,20 +192,21 @@ class TranscriptionSection extends LitElement {
                 .value="${this.tag}"
                 @change="${(e) => (this.tag = e.target.value)}"
               >
-                <option value="SOT">SOT</option>
-                <option value="CIV">CIV</option>
-                <option value="UNKWN">UNKWN</option>
+                <option value="SOT" ?selected="${this.tag === 'SOT'}">SOT</option>
+                <option value="CIV" ?selected="${this.tag === 'CIV'}">CIV</option>
+                <option value="UNKWN" ?selected="${this.tag === 'UNKWN'}">UNKWN</option>
               </select>
+
               <label for="field">Field:</label>
               <select
-                id="tag"
+                id="field"
                 .value="${this.field}"
-                @change="${(e) => (this.tag = e.target.value)}"
+                @change="${(e) => (this.field = e.target.value)}"
               >
-                <option value="GRND">GRND</option>
-                <option value="AIR">AIR</option>
-                <option value="SEA">SEA</option>
-                <option value="SIGNAL">SIGNAL</option>
+                <option value="GRND" ?selected="${this.field === 'GRND'}">GRND</option>
+                <option value="AIR" ?selected="${this.field === 'AIR'}">AIR</option>
+                <option value="SEA" ?selected="${this.field === 'SEA'}">SEA</option>
+                <option value="SIGNAL" ?selected="${this.field === 'SIGNAL'}">SIGNAL</option>
               </select>
             </div>
           </div>

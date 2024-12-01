@@ -22,6 +22,12 @@ public class Transcription {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String text;
 
+    @Column(nullable = true)
+    private String tag;
+
+    @Column(nullable = true)
+    private String field;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -61,5 +67,21 @@ public class Transcription {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public void setField(String field) {
+        this.field = field;
     }
 }
