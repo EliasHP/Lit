@@ -55,6 +55,8 @@ public class StartupService {
             System.out.println("Missing files detected in the folder:");
             for (AudioFile missingFile : missingFiles) {
                 System.out.println("- " + missingFile.getName());
+                audioFileRepository.delete(missingFile);
+                System.out.println("Removed missing file from the database: " + missingFile.getName());
             }
         }
     }
