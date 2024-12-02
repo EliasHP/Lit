@@ -92,17 +92,19 @@ class TranscriptionSection extends LitElement {
   async fetchTranscription() {
     if (!this.fileName || this.fileName === "No file loaded") {
       console.warn("No valid file name provided for fetching transcription.");
-      return; // Skip fetching if no valid file name
+      return;
     }
-
+  
+    const encodedFileName = encodeURIComponent(this.fileName); // Encode for backend request
+  
     try {
       const response = await fetch(
-        `http://localhost:8080/api/transcriptions/${this.fileName}`,
+        `http://localhost:8080/api/transcriptions/${encodedFileName}`,
       );
       if (!response.ok) {
         throw new Error(`Error fetching transcription: ${response.status}`);
       }
-
+  
       const data = await response.json();
       this.fromTime = data.from;
       this.toTime = data.to;
@@ -114,22 +116,27 @@ class TranscriptionSection extends LitElement {
       console.error("Error fetching transcription:", error);
     }
   }
-
-  // Save transcription data to the backend
   async saveTranscription() {
     if (!this.fileName) {
       alert("No file selected");
       return;
     }
-
+  
+    
+    const decodedFileName = decodeURIComponent(this.fileName);
+    const encodedFileName = encodeURIComponent(decodedFileName.replace("_denoised.mp3", ".mp3"));
+  
     const payload = {
-      fileName: this.fileName.replace("_denoised.mp3", ".mp3"), // Remove _denoise suffix from edited files so we still make marking on the og file
+      fileName: decodedFileName, 
       from: this.fromTime,
       to: this.toTime,
       transcription: this.transcriptionText,
       tag: this.tag,
       field: this.field,
     };
+    console.log("Decoded FileName:", decodedFileName);
+    console.log("Encoded FileName for Backend:", encodedFileName);
+    console.log("Payload:", payload);
 
     try {
       const response = await fetch("http://localhost:8080/api/transcriptions", {
@@ -139,24 +146,27 @@ class TranscriptionSection extends LitElement {
         },
         body: JSON.stringify(payload),
       });
-
+  
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-
+  
       alert("Transcription saved successfully!");
     } catch (error) {
       console.error("Error saving transcription:", error);
       alert("Failed to save transcription. Check the logs for details.");
     }
   }
+  
+  
 
-  // Trigger fetching when `fileName` changes
   updated(changedProperties) {
     if (changedProperties.has("fileName")) {
+      this.fileName = decodeURIComponent(this.fileName); // Decode file name for display
       this.fetchTranscription();
     }
   }
+
   async clearTranscription() {
     if (!this.fileName) {
       alert("No file selected");
@@ -164,7 +174,7 @@ class TranscriptionSection extends LitElement {
     }
 
     try {
-      await clearTranscription(this.fileName.replace("_denoised.mp3", ".mp3"));
+      await clearTranscription(encodeURIComponent(this.fileName.replace("_denoised.mp3", ".mp3")));
       this.fromTime = "";
       this.toTime = "";
       this.transcriptionText = "";

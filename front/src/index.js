@@ -131,6 +131,20 @@ class App extends LitElement {
       resize: vertical;
       padding-left: 20px;
     }
+    .file-lists-container {
+      display: flex;
+      gap: 1rem; /* Space between the two lists */
+    }
+
+    audio-file-list, categorized-file-list {
+      flex: 1; /* Distribute available space equally */
+      max-height: 80vh;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      background-color: #fff;
+    }
   `;
 
   constructor() {
@@ -145,14 +159,23 @@ class App extends LitElement {
   }
   async connectedCallback() {
     super.connectedCallback();
-    this.audioFiles = await fetchAudioFiles();
+    const fetchedFiles = await fetchAudioFiles();
+  
+    // Decode file names and ignore `.gitignore` files
+    this.audioFiles = fetchedFiles
+      .map((file) => ({
+        ...file,
+        name: decodeURIComponent(file.name), // Decode %20 to spaces
+        fileName: decodeURIComponent(file.fileName), // Ensure both `name` and `fileName` are consistent
+      }))
+      .filter((file) => file.name !== ".gitignore"); // Exclude `.gitignore`
+  
     this.updateFileLists();
   }
 
   updateFileLists() {
     this.categorizedFiles = {};
     this.filteredFiles = [];
-
     this.audioFiles.forEach((file) => {
       if (file.tag && file.field) {
         if (!this.categorizedFiles[file.tag]) {
@@ -210,14 +233,16 @@ class App extends LitElement {
                 @search="${(e) => this.handleSearch(e.detail)}"
               ></search-bar>
             </div>
-            <categorized-file-list
-              .categorizedFiles="${this.categorizedFiles}"
-              @file-selected="${(e) => this.handleFileSelection(e.detail)}"
-            ></categorized-file-list>
-            <audio-file-list
-              .audioFiles="${this.filteredFiles}"
-              @file-selected="${(e) => this.handleFileSelection(e.detail)}"
-            ></audio-file-list>
+            <div class="file-lists-container">
+              <categorized-file-list
+                .categorizedFiles="${this.filteredFiles}"
+                @file-selected="${(e) => this.handleFileSelection(e.detail)}"
+              ></categorized-file-list>
+              <audio-file-list
+                .audioFiles="${this.filteredFiles}"
+                @file-selected="${(e) => this.handleFileSelection(e.detail)}"
+              ></audio-file-list>
+            </div>
           </div>
           <div class="right-container">
             <div class="audio-player-container">
