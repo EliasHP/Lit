@@ -36,39 +36,28 @@ class AudioFileList extends LitElement {
     this.audioFiles = [];
   }
 
-  willUpdate(changedProperties) {
-    if (changedProperties.has("audioFiles")) {
-      // Optional: Add any preprocessing of audioFiles here if needed
-      console.log("Audio files updated:", this.audioFiles);
-    }
-  }
   handleFileClick(file) {
-    console.log("File clicked:", file); // Debug log
     this.dispatchEvent(new CustomEvent("file-selected", { detail: file }));
   }
 
-  generateFileList() {
+  render() {
     if (!this.audioFiles || this.audioFiles.length === 0) {
-      return html`<li>No audio files found.</li>`;
+      return html`<p>No untagged audio files available.</p>`;
     }
 
-    return this.audioFiles.map(
-      (file) => html`
-        <li class="audio-item" @click="${() => this.handleFileClick(file)}">
-          <span>${file.name}</span>
-          <span>${file.path}</span>
-        </li>
-      `,
-    );
-  }
-
-  render() {
     return html`
-      <div class="audio-list-container">
-        <ul class="audio-list">
-          ${this.generateFileList()}
-        </ul>
-      </div>
+      <ul class="audio-list">
+        ${this.audioFiles.map(
+          (file) => html`
+            <li
+              class="audio-item"
+              @click="${() => this.handleFileClick(file)}"
+            >
+              ${file.name}
+            </li>
+          `,
+        )}
+      </ul>
     `;
   }
 }

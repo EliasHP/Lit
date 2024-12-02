@@ -9,3 +9,9 @@ launch:
 cd back
 mvn clean package
 docker-compose up --build
+
+
+frontend:
+cd front
+npm install (first time only)
+npm run dev

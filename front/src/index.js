@@ -3,12 +3,15 @@ import "./components/audioFileList.js";
 import "./components/UnifiedAudioPlayer.js";
 import "./components/SearchBar.js";
 import "./components/App.css";
+import "./components/CategorizedFileList.js";
 import { fetchAudioFiles } from "./api.js";
+
 class App extends LitElement {
   static properties = {
     audioFiles: { type: Array },
     filteredFiles: { type: Array },
     selectedFile: { type: Object },
+    categorizedFiles: { type: Object },
   };
 
   static styles = css`
@@ -134,6 +137,7 @@ class App extends LitElement {
     super();
     this.audioFiles = [];
     this.filteredFiles = [];
+    this.categorizedFiles = {};
     this.selectedFile = null;
   }
   handleSidebarCollapse(collapsed) {
@@ -142,21 +146,43 @@ class App extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
     this.audioFiles = await fetchAudioFiles();
-    this.filteredFiles = [...this.audioFiles];
+    this.updateFileLists();
+  }
 
-    // Set the first file as default if available
+  updateFileLists() {
+    this.categorizedFiles = {};
+    this.filteredFiles = [];
+
+    this.audioFiles.forEach((file) => {
+      if (file.tag && file.field) {
+        if (!this.categorizedFiles[file.tag]) {
+          this.categorizedFiles[file.tag] = { fields: {}, expanded: true };
+        }
+        if (!this.categorizedFiles[file.tag].fields[file.field]) {
+          this.categorizedFiles[file.tag].fields[file.field] = {
+            files: [],
+            expanded: true,
+          };
+        }
+        this.categorizedFiles[file.tag].fields[file.field].files.push(file);
+      } else {
+        this.filteredFiles.push(file);
+      }
+    });
+
     if (this.filteredFiles.length > 0) {
       this.selectedFile = this.filteredFiles[0];
+    } else {
+      this.selectedFile = null;
     }
   }
 
   handleSearch(query) {
     const lowerQuery = query.toLowerCase();
-    this.filteredFiles = this.audioFiles.filter((file) =>
-      file.name.toLowerCase().includes(lowerQuery),
-    );
+    this.filteredFiles = this.audioFiles
+      .filter((file) => !file.tag || !file.field)
+      .filter((file) => file.name.toLowerCase().includes(lowerQuery));
 
-    // Update the selected file if filtered list changes
     if (this.filteredFiles.length > 0) {
       this.selectedFile = this.filteredFiles[0];
     } else {
@@ -172,34 +198,26 @@ class App extends LitElement {
     };
   }
 
+
   render() {
     return html`
       <div id="header">Lit Listener</div>
       <div class="layout-container">
-        <side-menu
-          @collapsed-changed="${(e) => this.handleSidebarCollapse(e.detail)}"
-        >
-          <!-- Add your sidebar content here -->
-        </side-menu>
-
-        <div
-          class="main-content ${this.sidebarCollapsed
-            ? "sidebar-collapsed"
-            : ""}"
-        >
+        <div class="main-content">
           <div class="left-container">
             <div class="search-container">
               <search-bar
                 @search="${(e) => this.handleSearch(e.detail)}"
               ></search-bar>
             </div>
-
-            <div class="file-list-container">
-              <audio-file-list
-                .audioFiles="${this.filteredFiles}"
-                @file-selected="${(e) => this.handleFileSelection(e.detail)}"
-              ></audio-file-list>
-            </div>
+            <categorized-file-list
+              .categorizedFiles="${this.categorizedFiles}"
+              @file-selected="${(e) => this.handleFileSelection(e.detail)}"
+            ></categorized-file-list>
+            <audio-file-list
+              .audioFiles="${this.filteredFiles}"
+              @file-selected="${(e) => this.handleFileSelection(e.detail)}"
+            ></audio-file-list>
           </div>
           <div class="right-container">
             <div class="audio-player-container">
@@ -213,5 +231,4 @@ class App extends LitElement {
     `;
   }
 }
-
 customElements.define("app-root", App);
