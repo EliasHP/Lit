@@ -172,10 +172,10 @@ class App extends LitElement {
   
     this.updateFileLists();
   }
-
   updateFileLists() {
     this.categorizedFiles = {};
     this.filteredFiles = [];
+  
     this.audioFiles.forEach((file) => {
       if (file.tag && file.field) {
         if (!this.categorizedFiles[file.tag]) {
@@ -192,14 +192,19 @@ class App extends LitElement {
         this.filteredFiles.push(file);
       }
     });
-
+  
     if (this.filteredFiles.length > 0) {
       this.selectedFile = this.filteredFiles[0];
     } else {
       this.selectedFile = null;
     }
+  
+    // Default empty object if no categorized files
+    if (Object.keys(this.categorizedFiles).length === 0) {
+      this.categorizedFiles = {};
+    }
   }
-
+  
   handleSearch(query) {
     const lowerQuery = query.toLowerCase();
     this.filteredFiles = this.audioFiles

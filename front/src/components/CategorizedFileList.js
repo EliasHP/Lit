@@ -28,12 +28,12 @@ class CategorizedFileList extends LitElement {
       cursor: pointer;
     }
   `;
-
+ 
   constructor() {
     super();
-    this.categorizedFiles = {};
+    this.categorizedFiles = {}; // Default to an empty object
   }
-
+  
   toggleCategory(tag) {
     this.categorizedFiles[tag].expanded = !this.categorizedFiles[tag].expanded;
     this.requestUpdate();
@@ -48,64 +48,44 @@ class CategorizedFileList extends LitElement {
   handleFileClick(file) {
     this.dispatchEvent(new CustomEvent("file-selected", { detail: file }));
   }
-
+  
   render() {
+    if (!this.categorizedFiles || Object.keys(this.categorizedFiles).length === 0) {
+      return html`<div>No categorized files available.</div>`;
+    }
+  
     return html`
-      <ul class="category-list">
+      <ul>
         ${Object.keys(this.categorizedFiles).map(
           (tag) => html`
             <li>
-              <div
-                class="category"
-                @click="${() => this.toggleCategory(tag)}"
-              >
-                ${tag} (${Object.keys(this.categorizedFiles[tag].fields).length})
-              </div>
-              ${this.categorizedFiles[tag].expanded
-                ? html`
-                    <ul>
-                      ${Object.keys(this.categorizedFiles[tag].fields).map(
-                        (field) => html`
-                          <li>
-                            <div
-                              class="subcategory"
+              <div>${tag} (${Object.keys(this.categorizedFiles[tag].fields).length})</div>
+              <ul>
+                ${Object.keys(this.categorizedFiles[tag].fields).map(
+                  (field) => html`
+                    <li>
+                      <div>${field}</div>
+                      <ul>
+                        ${this.categorizedFiles[tag].fields[field].files.map(
+                          (file) => html`
+                            <li
                               @click="${() =>
-                                this.toggleSubcategory(tag, field)}"
+                                this.handleFileSelection(file)}"
                             >
-                              ${field}
-                            </div>
-                            ${this.categorizedFiles[tag].fields[field].expanded
-                              ? html`
-                                  <ul>
-                                    ${this.categorizedFiles[tag].fields[
-                                      field
-                                    ].files.map(
-                                      (file) => html`
-                                        <li
-                                          class="file-item"
-                                          @click="${() =>
-                                            this.handleFileClick(file)}"
-                                        >
-                                          ${file.name} FROM: ${file.from} TO:
-                                          ${file.to}
-                                        </li>
-                                      `,
-                                    )}
-                                  </ul>
-                                `
-                              : ""}
-                          </li>
-                        `,
-                      )}
-                    </ul>
-                  `
-                : ""}
+                              ${file.name} FROM: ${file.from || ""} TO: ${file.to || ""}
+                            </li>
+                          `,
+                        )}
+                      </ul>
+                    </li>
+                  `,
+                )}
+              </ul>
             </li>
           `,
         )}
       </ul>
     `;
-  }
+    }
 }
-
 customElements.define("categorized-file-list", CategorizedFileList);
