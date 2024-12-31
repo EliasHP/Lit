@@ -95,10 +95,7 @@ class TranscriptionSection extends LitElement {
       return;
     }
     const decodedFileName = decodeURIComponent(this.fileName);
-    const encodedFileName = encodeURIComponent(
-      decodedFileName.replace("_denoised.mp3", ".mp3"),
-    );
-    //this.fileName=encodedFileName;
+    const encodedFileName = encodeURIComponent(decodedFileName.replace("_denoised.mp3", ".mp3"));
     try {
       const response = await fetch(
         `http://localhost:8080/api/transcriptions/${encodedFileName}`,
@@ -106,7 +103,7 @@ class TranscriptionSection extends LitElement {
       if (!response.ok) {
         throw new Error(`Error fetching transcription: ${response.status}`);
       }
-
+  
       const data = await response.json();
       this.fromTime = data.from;
       this.toTime = data.to;
@@ -123,10 +120,10 @@ class TranscriptionSection extends LitElement {
       alert("No file selected");
       return;
     }
-
+  
     const decodedFileName = decodeURIComponent(this.fileName);
     const encodedFileName = decodedFileName.replace("_denoised.mp3", ".mp3");
-
+  
     const payload = {
       fileName: encodedFileName,
       from: this.fromTime,
@@ -135,11 +132,11 @@ class TranscriptionSection extends LitElement {
       tag: this.tag,
       field: this.field,
     };
-
+  
     console.log("Decoded FileName:", decodedFileName);
     console.log("Encoded FileName for Backend:", encodedFileName);
     console.log("Payload:", payload);
-
+  
     try {
       const response = await fetch("http://localhost:8080/api/transcriptions", {
         method: "POST",
@@ -148,17 +145,17 @@ class TranscriptionSection extends LitElement {
         },
         body: JSON.stringify(payload),
       });
-
+  
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-
+  
       alert("Transcription saved successfully!");
-
+  
       // Dispatch a custom event to trigger list refresh
       const event = new CustomEvent("file-updated", {
-        bubbles: true, // Ensure it bubbles up the DOM
-        composed: true, // Allow it to cross Shadow DOM boundaries
+        bubbles: true, 
+        composed: true, 
       });
       this.dispatchEvent(event);
     } catch (error) {
@@ -166,10 +163,10 @@ class TranscriptionSection extends LitElement {
       alert("Failed to save transcription. Check the logs for details.");
     }
   }
-
+  
   updated(changedProperties) {
     if (changedProperties.has("fileName")) {
-      this.fileName = decodeURIComponent(this.fileName); // Decode file name for display
+      this.fileName = decodeURIComponent(this.fileName); 
       this.fetchTranscription();
     }
   }
@@ -181,9 +178,7 @@ class TranscriptionSection extends LitElement {
     }
 
     try {
-      await clearTranscription(
-        encodeURIComponent(this.fileName.replace("_denoised.mp3", ".mp3")),
-      );
+      await clearTranscription(encodeURIComponent(this.fileName.replace("_denoised.mp3", ".mp3")));
       this.fromTime = "";
       this.toTime = "";
       this.transcriptionText = "";
@@ -200,9 +195,7 @@ class TranscriptionSection extends LitElement {
       <div class="transcription-section">
         <h4>
           Transcription for:
-          ${decodeURIComponent(
-            this.fileName.replace("_denoised.mp3", ".mp3"),
-          ) || "No file loaded"}
+          ${decodeURIComponent(this.fileName.replace("_denoised.mp3", ".mp3")) || "No file loaded"}
         </h4>
         <div class="write-section">
           <div class="additional-fields">
@@ -213,15 +206,9 @@ class TranscriptionSection extends LitElement {
                 .value="${this.tag}"
                 @change="${(e) => (this.tag = e.target.value)}"
               >
-                <option value="SOT" ?selected="${this.tag === "SOT"}">
-                  SOT
-                </option>
-                <option value="CIV" ?selected="${this.tag === "CIV"}">
-                  CIV
-                </option>
-                <option value="UNKWN" ?selected="${this.tag === "UNKWN"}">
-                  UNKWN
-                </option>
+                <option value="SOT" ?selected="${this.tag === 'SOT'}">RED</option>
+                <option value="CIV" ?selected="${this.tag === 'CIV'}">Green</option>
+                <option value="UNKWN" ?selected="${this.tag === 'UNKWN'}">GREY</option>
               </select>
 
               <label for="field">Field:</label>
@@ -230,18 +217,10 @@ class TranscriptionSection extends LitElement {
                 .value="${this.field}"
                 @change="${(e) => (this.field = e.target.value)}"
               >
-                <option value="GRND" ?selected="${this.field === "GRND"}">
-                  GRND
-                </option>
-                <option value="AIR" ?selected="${this.field === "AIR"}">
-                  AIR
-                </option>
-                <option value="SEA" ?selected="${this.field === "SEA"}">
-                  SEA
-                </option>
-                <option value="SIGNAL" ?selected="${this.field === "SIGNAL"}">
-                  SIGNAL
-                </option>
+                <option value="GRND" ?selected="${this.field === 'GRND'}">DARK GREEN</option>
+                <option value="AIR" ?selected="${this.field === 'AIR'}">WHITE</option>
+                <option value="SEA" ?selected="${this.field === 'SEA'}">DARK BLUE</option>
+                <option value="SIGNAL" ?selected="${this.field === 'SIGNAL'}">GREY</option>
               </select>
             </div>
           </div>

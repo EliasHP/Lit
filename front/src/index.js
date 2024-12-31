@@ -2,7 +2,7 @@ import { LitElement, html, css } from "lit";
 
 import "./components/UnifiedAudioPlayer.js";
 import "./components/SearchBar.js";
-import "./components/App.css";
+import "./components/app.css";
 import "./components/CategorizedFileList.js";
 import { fetchAudioFiles } from "./api.js";
 
