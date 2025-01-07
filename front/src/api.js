@@ -1,5 +1,36 @@
 const API_BASE_URL = "http://localhost:8080/api/audio"; // Backend API URL
 
+
+export async function uploadAudioFiles(files) {
+  const formData = new FormData();
+  Array.from(files).forEach((file) => {
+    if (file.type === "audio/mpeg") {
+      formData.append("files", file);
+    } else {
+      throw new Error("Only MP3 files are supported.");
+    }
+  });
+
+  try {
+    const response = await fetch(`http://localhost:8080/api/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "File upload failed.");
+    }
+
+    const data = await response.json();
+    console.log("Files uploaded successfully:", data);
+    return data;
+  } catch (error) {
+    console.error("Error uploading files:", error);
+    throw error;
+  }
+}
+
 // Fetch all audio files from the backend
 export async function fetchAudioFiles() {
   try {

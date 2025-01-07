@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
     AudioFile findByName(String name);
+
+    boolean existsByName(String name);
 }

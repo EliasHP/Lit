@@ -11,6 +11,9 @@ RUN npm install
 # Copy the rest of the frontend files
 COPY . .
 
+# Set environment to development mode
+ENV NODE_ENV=development
+
 # Expose the Vite development server port
 EXPOSE 5173
 

@@ -3,6 +3,7 @@ import { LitElement, html, css } from "lit";
 import "./components/UnifiedAudioPlayer.js";
 import "./components/SearchBar.js";
 import "./components/app.css";
+import "./components/FileUpload.js";
 import "./components/CategorizedFileList.js";
 import { fetchAudioFiles } from "./api.js";
 
@@ -150,6 +151,7 @@ class App extends LitElement {
     this.selectedFile = null;
 
     this.addEventListener("file-updated", () => this.handleFileUpdated());
+    this.addEventListener("files-uploaded", () => this.handleFilesUploaded());
   }
 
   handleFileSelection(file) {
@@ -159,7 +161,18 @@ class App extends LitElement {
       url: `${backendBaseUrl}/${decodeURIComponent(file.fileName || file.name)}`, // Ensure proper URL formatting
     };
   }
+  handleFileUpdated() {
+    const categorizedFileList = this.shadowRoot.querySelector(
+      "categorized-file-list"
+    );
+    if (categorizedFileList) {
+      categorizedFileList.refetchFiles();
+    }
+  }
 
+  handleFilesUploaded() {
+    this.handleFileUpdated();
+  }
   handleFileUpdated() {
     const categorizedFileList = this.shadowRoot.querySelector(
       "categorized-file-list",
@@ -175,6 +188,9 @@ class App extends LitElement {
       <div class="layout-container">
         <div class="main-content">
           <div class="left-container">
+          <div class="upload-section">
+            <file-upload></file-upload>
+          </div>
             <div class="search-container">
               <search-bar
                 @search="${(e) => this.handleSearch(e.detail)}"
