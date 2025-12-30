@@ -32,6 +32,9 @@ build/
 ### VS Code ###
 vscode/
 .vscode/
+# Audio assets saved locally by the Tauri runtime
+audio/*
+!audio/.gitkeep
 # Ignore all files in the audio folder
 back/src/main/audio/*
 back/src/audio/*
