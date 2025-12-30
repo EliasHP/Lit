@@ -1,0 +1,31 @@
+{
+  "build": {
+    "beforeBuildCommand": "cd ../front && npm run build",
+    "beforeDevCommand": "cd ../front && npm run dev -- --host --port 5173",
+    "devPath": "http://localhost:5173",
+    "distDir": "../front/dist"
+  },
+  "package": {
+    "productName": "LitListener",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": true
+    },
+    "bundle": {
+      "active": true,
+      "identifier": "com.example.litlistener"
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "title": "Lit Listener",
+        "width": 1280,
+        "height": 900
+      }
+    ]
+  }
+}
